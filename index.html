@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mbed</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Define CSS variables for consistent heights */
+        :root {
+            --nav-height-desktop: 5rem; /* Base height for thumbnails + padding */
+            --nav-height-mobile: 4.5rem; /* Adjusted for mobile padding */
+        }
+
+        html, body {
+            height: 100%; /* Ensures html and body truly span 100% height */
+            margin: 0; /* Remove default margins */
+            padding: 0; /* Remove default padding */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensures body takes full viewport height */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            /* Default body background for light theme, matched to nav-thumbnails */
+            background-color: #e5e7eb;
+            color: #1f2937; /* Dark gray text */
+        }
+        /* Light Theme Defaults (overrides for specific elements) */
+        .nav-thumbnails {
+            background-color: #e5e7eb; /* Solid light gray */
+            box-shadow: none !important; /* No shadow, with !important for strict override */
+            min-height: var(--nav-height-desktop); /* Ensure minimum height */
+            height: auto; /* Allow auto height based on content wrapping */
+            border-top-left-radius: 0 !important; /* Removed rounded edges, with !important */
+            border-top-right-radius: 0 !important; /* Removed rounded edges, with !important */
+        }
+        .thumbnail-item {
+            background-color: #cfd8dc; /* Slightly darker light gray for placeholder */
+        }
+        .thumbnail-item.active {
+            border: 3px solid #6366f1; /* Purple border for active */
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); /* Glow effect */
+        }
+        .arrow-button {
+            background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+            color: white;
+            opacity: 0; /* Initially hidden */
+            border-radius: 0; /* No rounded corners */
+        }
+        .arrow-button:hover {
+            background-color: rgba(255, 255, 255, 0.4); /* More opaque white on hover */
+            opacity: 1 !important; /* Ensure hover on button overrides container hover */
+        }
+        .theme-toggle {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .theme-toggle:hover {
+            background-color: #d1d5db;
+        }
+        .theme-toggle svg {
+            fill: currentColor; /* Use current text color for SVG fill */
+            width: 1.5rem; /* Icon size */
+            height: 1.5rem; /* Icon size */
+        }
+        .app-name {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #4b5563; /* Darker text for app name */
+            padding: 0.5rem 1rem; /* Padding for button look */
+            display: flex;
+            align-items: center;
+            background-color: #cfd8dc; /* Button background color for light mode */
+            border-radius: 0.5rem; /* Rounded edges for button */
+            cursor: pointer; /* Indicate clickable */
+            transition: background-color 0.2s ease; /* Smooth transition on hover */
+            position: relative; /* Needed for positioning the submenu */
+            z-index: 30; /* Ensure the app name and its submenu are on top */
+        }
+        .app-name:hover {
+            background-color: #b0bec5; /* Darker on hover for light mode */
+        }
+
+        /* Dark Theme Styles */
+        body.dark {
+            background-color: #1f2937; /* Dark blue-gray background */
+            color: #e5e7eb; /* Light gray text */
+        }
+        body.dark .nav-thumbnails {
+            background-color: #374151; /* Solid dark gray */
+            box-shadow: none !important; /* No shadow, with !important for strict override */
+            border-top-left-radius: 0 !important; /* Removed rounded edges, with !important */
+            border-top-right-radius: 0 !important; /* Removed rounded edges, with !important */
+        }
+        body.dark .thumbnail-item {
+            background-color: #4b5563; /* Darker gray for placeholder */
+        }
+        body.dark .thumbnail-item.active {
+            border: 3px solid #818cf8; /* Lighter purple border for active */
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.3); /* Lighter glow effect */
+        }
+        body.dark .theme-toggle {
+            background-color: #4b5563;
+            color: #e5e7eb;
+        }
+        body.dark .theme-toggle:hover {
+            background-color: #6b7280;
+        }
+        body.dark .app-name {
+            color: #cbd5e1; /* Lighter text for app name in dark mode */
+            background-color: #4b5563; /* Button background color for dark mode */
+        }
+        body.dark .app-name:hover {
+            background-color: #607d8b; /* Darker on hover for dark mode */
+        }
+
+        /* Hover effect for the main gallery container to reveal arrows */
+        .gallery-container:hover .arrow-button {
+            opacity: 1;
+        }
+
+        .gallery-container {
+            flex-grow: 0; /* No longer growing implicitly, height is explicit */
+            flex-shrink: 0; /* Prevents shrinking */
+            display: flex;
+            flex-direction: column; /* To center media vertically within it */
+            align-items: center;
+            justify-content: center;
+            padding: 0; /* Removed padding to allow media to reach edges */
+            position: relative;
+            background-color: #FFFFFF; /* Reverted to original background color */
+            box-shadow: none !important; /* NO shadow in light mode, with !important for strict override */
+            border-radius: 0; /* No rounded corners for the gallery container */
+            width: 100%; /* Takes full width of parent (body) */
+            height: calc(100vh - var(--nav-height-desktop)); /* Explicit height calculation */
+            overflow: hidden; /* Hide overflow for media that's larger than the container */
+            margin-bottom: 0; /* No margin at the bottom, handled by thumbnail nav positioning */
+            box-sizing: border-box; /* Include padding in element's total width/height */
+        }
+        body.dark .gallery-container {
+            background-color: #000000; /* Reverted to original background color */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); /* Stronger shadow in dark mode */
+            border-radius: 0; /* No rounded corners for the gallery container in dark mode */
+        }
+
+        /* Styling for ALL media elements (images and videos) within gallery-container */
+        #galleryContainer img, #galleryContainer video {
+            display: block;
+            width: auto; /* Allow natural width */
+            height: auto; /* Allow natural height */
+            max-width: 100%; /* Scale down if wider than container */
+            max-height: 100%; /* Scale down if taller than container */
+            border-radius: 0;
+            object-fit: contain; /* Ensure entire media is visible, scaling down if needed */
+            margin: auto; /* Center the media within the display area */
+            box-sizing: border-box;
+        }
+
+        .nav-thumbnails {
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between; /* Pushes app name left, thumbnail wrapper right */
+            align-items: center; /* Aligns items vertically in the center */
+            flex-wrap: wrap; /* Allow thumbnails to wrap on smaller screens */
+            width: 100%; /* Take full width */
+            box-sizing: border-box;
+            flex-shrink: 0; /* Prevent the nav from shrinking */
+        }
+        .thumbnail-wrapper {
+            display: flex; /* Makes the wrapper a flex container */
+            justify-content: center; /* Centers thumbnails horizontally within this wrapper */
+            flex-grow: 1; /* Allows this wrapper to take up available space */
+            gap: 0.75rem; /* Space between thumbnails */
+            flex-wrap: wrap; /* Allow thumbnails to wrap */
+            padding: 0 1rem; /* Add some horizontal padding to wrapper */
+        }
+        .thumbnail-item {
+            width: 5rem; /* Fixed thumbnail width */
+            height: 3.5rem; /* Fixed thumbnail height */
+            border-radius: 0.75rem; /* Rounded thumbnails */
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .thumbnail-item img, .thumbnail-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the thumbnail area */
+            border-radius: 0.75rem;
+        }
+.thumbnail-item:hover:not(.active) {
+            transform: translateY(-3px); /* Lift effect on hover */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Dark overlay */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            border-radius: 0.75rem;
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+        .arrow-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s ease, opacity 0.3s ease; /* Added opacity transition */
+            z-index: 10; /* Ensure it's above media */
+        }
+        .arrow-left {
+            left: 1rem;
+        }
+        .arrow-right {
+            right: 1rem;
+        }
+
+        /* Submenu container styles */
+        .submenu-container {
+            position: absolute;
+            bottom: 100%; /* Position above the app-name */
+            left: 0;
+            display: none; /* Start hidden for instant show/hide */
+            flex-direction: column; /* Vertical layout */
+            background-color: #e5e7eb; /* Match light theme nav background */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            z-index: 20; /* Ensure it's above other elements but below app-name */
+            min-width: 100%; /* Ensure it's at least as wide as app-name */
+            align-items: flex-start; /* Align items to the left within submenu */
+            gap: 0.25rem; /* Space between submenu items */
+        }
+
+        body.dark .submenu-container {
+            background-color: #374151; /* Match dark theme nav background */
+            box-shadow: 0 44x 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .submenu-container.show {
+            display: flex; /* Show instantly when 'show' class is added */
+        }
+
+        /* Adjust theme toggle inside submenu */
+        .submenu-container .theme-toggle {
+            position: static; /* Remove absolute positioning */
+            border-radius: 0.5rem; /* Make it rectangular */
+            width: auto; /* Allow width to fit content */
+            height: auto; /* Adjust height based on content */
+            padding: 0.5rem; /* Reduced padding for smaller, icon-only button */
+            justify-content: center; /* Center the icon horizontally */
+            align-self: center; /* Center the button within the flex container */
+        }
+        .submenu-container .theme-toggle:hover {
+            background-color: #d1d5db; /* Light hover */
+        }
+        body.dark .submenu-container .theme-toggle:hover {
+            background-color: #6b7280; /* Dark hover */
+        }
+        .submenu-container .theme-toggle svg {
+            margin-right: 0; /* Remove space if no text */
+        }
+
+        /* Search bar and button specific styling */
+        .search-container input {
+            height: 46px; /* Set fixed height as requested */
+            /* Remove vertical padding that might conflict with fixed height */
+            padding-top: 0;
+            padding-bottom: 0;
+            /* Use flex to ensure vertical centering of placeholder text */
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container button {
+            height: 46px; /* Set fixed height as requested */
+            /* Remove vertical padding that might conflict with fixed height */
+            padding-top: 0;
+            padding-bottom: 0;
+            /* Use flex to center SVG icon vertically and horizontally */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Styling for the new media name button */
+        #mediaNameButton {
+            background-color: #8b5cf6; /* A shade of purple */
+            color: white;
+            padding: 0 0.75rem; /* Adjust horizontal padding */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600; /* font-semibold */
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease;
+            white-space: nowrap; /* Prevent text wrapping */
+            overflow: hidden; /* Hide overflow text */
+            text-overflow: ellipsis; /* Add ellipsis for overflow */
+            max-width: 150px; /* Limit width for long names */
+        }
+        #mediaNameButton:hover {
+            background-color: #7c3aed; /* Darker purple on hover */
+        }
+        body.dark #mediaNameButton {
+            background-color: #a78bfa; /* Lighter purple in dark mode */
+        }
+        body.dark #mediaNameButton:hover {
+            background-color: #8b5cf6; /* Darker on hover in dark mode */
+        }
+
+        /* Styling for the new horizontal connector line */
+        .horizontal-connector-line {
+            width: 1.5rem; /* Adjusted width for the horizontal line */
+            height: 2px; /* Thin line */
+            background-color: #6b7280; /* Gray color for the line */
+            /* Adjust margins to make it appear to 'touch' the rounded buttons */
+            margin: 0 0.25rem; /* Small horizontal margin for visual spacing */
+        }
+
+        /* Styling for the new gallery name button */
+        #galleryNameButton {
+            background-color: #9ca3af; /* A light gray */
+            color: #1f2937; /* Dark gray text */
+            padding: 0 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px; /* Adjust max width as needed */
+        }
+        #galleryNameButton:hover {
+            background-color: #6b7280; /* Darker gray on hover */
+        }
+        body.dark #galleryNameButton {
+            background-color: #6b7280; /* Darker gray in dark mode */
+            color: #e5e7eb; /* Light text in dark mode */
+        }
+        body.dark #galleryNameButton:hover {
+            background-color: #4b5563; /* Even darker on hover in dark mode */
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            :root {
+                --nav-height-desktop: 4.5rem; /* Update variable for mobile */
+            }
+            .gallery-container {
+                width: 100%; /* Take full width of parent (body) */
+                height: calc(100vh - var(--nav-height-desktop)); /* Will use the mobile nav height */
+                padding: 0; /* Removed padding for mobile */
+            }
+            /* Media styling for smaller screens */
+            #galleryContainer img, #galleryContainer video {
+                 max-width: 100%; /* Adjust based on new padding */
+                 max-height: 100%; /* Adjust based on new padding */
+            }
+            .thumbnail-item {
+                width: 4rem;
+                height: 2.8rem;
+                margin-bottom: 0.5rem; /* Add some vertical spacing */
+            }
+            .nav-thumbnails {
+                padding: 0.5rem;
+                gap: 0.5rem;
+                min-height: var(--nav-height-desktop); /* Ensure min-height on mobile */
+                border-top-left-radius: 0 !important; /* Removed rounded edges for mobile, with !important */
+                border-top-right-radius: 0 !important; /* Removed rounded edges for mobile, with !important */
+            }
+            .app-name {
+                padding-left: 0.5rem; /* Smaller padding on mobile */
+                font-size: 1rem;
+            }
+            .thumbnail-wrapper {
+                padding: 0 0.5rem; /* Adjust padding for mobile */
+            }
+            .arrow-button {
+                padding: 0.3rem 0.8rem;
+                font-size: 1.5rem;
+            }
+            .gallery-container:hover .arrow-button {
+                opacity: 1;
+            }
+            .submenu-container .theme-toggle {
+                padding: 0.4rem; /* Smaller padding for mobile */
+            }
+            /* Search container adjustments for mobile */
+            .search-container {
+                width: 100%; /* Take full width */
+                justify-content: center; /* Center items */
+                margin-top: 0.5rem; /* Add some top margin */
+                order: 4; /* Push it to the next line on small screens */
+            }
+            .search-container input {
+                flex-grow: 1; /* Allow input to grow */
+                max-width: 80%; /* Limit max width */
+            }
+            #mediaNameButton {
+                max-width: 100px; /* Even smaller width on mobile */
+                font-size: 0.75rem; /* Smaller font on mobile */
+                padding: 0 0.5rem;
+            }
+            #galleryNameButton {
+                max-width: 80px; /* Adjust for even smaller mobile screen */
+                font-size: 0.75rem;
+                padding: 0 0.5rem;
+            }
+            .navbar-left-section {
+                width: 100%; /* Take full width on mobile */
+                justify-content: center; /* Center items */
+                margin-bottom: 0.5rem; /* Space before thumbnails */
+            }
+        }
+        @media (max-width: 480px) {
+            .thumbnail-item {
+                width: 3.5rem;
+                height: 2.5rem;
+            }
+            .nav-thumbnails {
+                border-top-left-radius: 0 !important;
+                border-top-right-radius: 0 !important;
+            }
+            /* Theme toggle is now within submenu, so these are not strictly needed but kept for completeness */
+            .theme-toggle {
+                top: auto; /* Remove absolute positioning */
+                right: auto; /* Remove absolute positioning */
+                width: auto;
+                height: auto;
+                border-radius: 0.5rem;
+            }
+            .theme-toggle svg {
+                width: 1.2rem;
+                height: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="galleryContainer" class="gallery-container">
+        <!-- Media (image or video) will be dynamically loaded here directly into gallery-container -->
+        <p class="initial-message text-gray-400">Loading media...</p>
+
+        <!-- Navigation Arrows (for visual click, primarily for keyboard) -->
+        <div id="prevArrow" class="arrow-button arrow-left">‹</div>
+        <div id="nextArrow" class="arrow-button arrow-right">›</div>
+    </div>
+
+    <!-- Thumbnail Navigation Bar -->
+    <div id="thumbnailNav" class="nav-thumbnails">
+        <div class="navbar-left-section flex items-center">
+            <div class="app-name">
+                mbed
+                <div id="themeSubmenu" class="submenu-container">
+                    <!-- Dark Mode Toggle Button moved inside submenu -->
+                    <button id="themeToggle" class="theme-toggle">
+                        <!-- SVG icons for theme toggle -->
+                        <svg class="sun-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg class="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- First horizontal line connecting "mbed" to "Art" -->
+            <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
+            <!-- New Gallery Name button -->
+            <button id="galleryNameButton" class="h-[46px] px-3 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors duration-200 text-sm font-semibold">
+                Art
+            </button>
+            <!-- Second horizontal line connecting "Art" to media name -->
+            <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
+            <!-- Media name button -->
+            <button id="mediaNameButton" class="h-[46px] px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200 text-sm font-semibold">
+                No Media Selected
+            </button>
+        </div>
+        <div id="thumbnailWrapper" class="thumbnail-wrapper">
+            <!-- Thumbnails will be dynamically loaded here -->
+        </div>
+        <!-- Search Bar and Button -->
+        <div class="search-container flex items-center gap-2">
+            <input type="text" id="searchInput" placeholder="Search tags" class="px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-gray-800">
+            <button id="searchButton" class="px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                    <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Array to hold your media (images and videos)
+        // IMPORTANT: For local files, ensure these images are in the SAME folder
+        // as your index.html file, or in a subfolder relative to it.
+        // Direct absolute paths like C:\Users\... will NOT work due to browser security.
+        const mediaItems = [
+            { src: 'Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg', type: 'image', alt: 'Mona Lisa by Leonardo da Vinci', name: 'Mona Lisa' },
+            { src: 'Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', type: 'image', alt: 'The Starry Night by Vincent van Gogh', name: 'The Starry Night' },
+            { src: 'Gustav_Klimt_046.jpg', type: 'image', alt: 'Portrait of Adele Bloch-Bauer I by Gustav Klimt', name: 'Adele Bloch-Bauer I' },
+            { src: 'The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg', type: 'image', alt: 'The Kiss by Gustav Klimt', name: 'The Kiss' },
+            { src: 'Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg', type: 'image', alt: 'The Scream by Edvard Munch', name: 'The Scream' },
+            { src: 'Grant_Wood_-_American_Gothic_-_Google_Art_Project.jpg', type: 'image', alt: 'American Gothic by Grant Wood', name: 'American Gothic' },
+            { src: 'GirlBeforeAMirror.jpg', type: 'image', alt: 'Girl Before a Mirror by Pablo Picasso', name: 'Girl Before a Mirror' },
+            { src: 'Las_Meninas,_by_Diego_Velázquez,_from_Prado_in_Google_Earth.jpg', type: 'image', alt: 'Las Meninas by Diego Velázquez', name: 'Las Meninas' } // Corrected filename
+        ];
+
+        let currentMediaIndex = 0;
+        const body = document.body;
+        const galleryContainer = document.getElementById('galleryContainer');
+        const thumbnailNav = document.getElementById('thumbnailNav');
+        const thumbnailWrapper = document.getElementById('thumbnailWrapper');
+        const prevArrow = document.getElementById('prevArrow');
+        const nextArrow = document.getElementById('nextArrow');
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = themeToggle.querySelector('.sun-icon');
+        const moonIcon = themeToggle.querySelector('.moon-icon');
+        const appName = document.querySelector('.app-name'); // Get the app-name div
+        const themeSubmenu = document.getElementById('themeSubmenu'); // Get the new submenu container
+        const searchInput = document.getElementById('searchInput'); // Get the search input
+        const searchContainer = document.querySelector('.search-container'); // Get the search container
+        const searchButton = document.getElementById('searchButton'); // Get the search button
+        const mediaNameButton = document.getElementById('mediaNameButton'); // Get the new media name button
+        const galleryNameButton = document.getElementById('galleryNameButton'); // Get the new gallery name button
+
+
+        // Function to display the selected media
+        function displayMedia(index) {
+            if (index < 0) {
+                index = mediaItems.length - 1;
+            } else if (index >= mediaItems.length) {
+                index = 0;
+            }
+            currentMediaIndex = index;
+
+            const existingMedia = galleryContainer.querySelector('img, video');
+            if (existingMedia) {
+                galleryContainer.removeChild(existingMedia);
+            }
+            const initialMessage = galleryContainer.querySelector('.initial-message');
+            if (initialMessage) {
+                galleryContainer.removeChild(initialMessage);
+            }
+
+            const item = mediaItems[currentMediaIndex];
+            let mediaElement;
+
+            if (item.type === 'image') {
+                mediaElement = document.createElement('img');
+                mediaElement.src = item.src;
+                mediaElement.alt = item.alt;
+                // Added an onerror handler for local files for better feedback
+                mediaElement.onerror = (e) => {
+                    console.error(`Error loading image: ${item.src}. Please ensure the file exists and the path is correct.`);
+                    // Only set placeholder if the original load failed
+                    if (!e.target.dataset.placeholderSet) {
+                        e.target.src = `https://placehold.co/1280x720/cccccc/000000?text=Image+Load+Error`;
+                        e.target.alt = 'Image failed to load (check path)';
+                        e.target.dataset.placeholderSet = 'true'; // Mark that placeholder has been set
+                    }
+                };
+            } else if (item.type === 'video') {
+                // Assuming no local video files based on current mediaItems, but keeping structure for future
+                mediaElement = document.createElement('video');
+                mediaElement.src = item.src;
+                mediaElement.controls = true;
+                mediaElement.autoplay = true;
+                mediaElement.loop = true;
+                mediaElement.alt = item.alt;
+                mediaElement.onerror = (e) => {
+                    console.error(`Error loading video: ${item.src}. Please ensure the file exists and the path is correct.`);
+                    const errorMessage = document.createElement('p');
+                    errorMessage.classList.add('text-red-500', 'text-center');
+                    errorMessage.textContent = 'Video failed to load (check path).';
+                    galleryContainer.insertBefore(errorMessage, prevArrow);
+                };
+            }
+
+            if (mediaElement) {
+                galleryContainer.insertBefore(mediaElement, prevArrow);
+            }
+
+            updateThumbnailHighlight();
+            // Update the new media name button text to use the 'name' property
+            mediaNameButton.textContent = item.name || 'Untitled Media';
+        }
+
+        function updateThumbnailHighlight() {
+            const thumbnails = document.querySelectorAll('.thumbnail-item');
+            thumbnails.forEach((thumb, i) => {
+                if (i === currentMediaIndex) {
+                    thumb.classList.add('active');
+                    thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+        }
+
+        function nextMedia() {
+            displayMedia(currentMediaIndex + 1);
+        }
+
+        function previousMedia() {
+            displayMedia(currentMediaIndex - 1);
+        }
+
+        function createThumbnails() {
+            mediaItems.forEach((item, index) => {
+                const thumbnailDiv = document.createElement('div');
+                thumbnailDiv.classList.add('thumbnail-item');
+                thumbnailDiv.dataset.index = index;
+
+                if (item.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = item.src; // Use relative path
+                    img.alt = `Thumbnail for ${item.alt}`;
+                    img.onerror = (e) => {
+                        console.error(`Error loading thumbnail: ${item.src}.`);
+                        if (!e.target.dataset.placeholderSet) {
+                            e.target.src = `https://placehold.co/80x60/dddddd/333333?text=Thumb+Error`;
+                            e.target.dataset.placeholderSet = 'true';
+                        }
+                    };
+                    thumbnailDiv.appendChild(img);
+                } else if (item.type === 'video') {
+                    const videoIcon = document.createElement('div');
+                    videoIcon.classList.add('video-overlay');
+                    videoIcon.innerHTML = '▶';
+                    thumbnailDiv.appendChild(videoIcon);
+                }
+
+                thumbnailDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    displayMedia(index);
+                });
+                thumbnailWrapper.appendChild(thumbnailDiv);
+            });
+        }
+
+        function toggleTheme() {
+            body.classList.toggle('dark');
+            const isDarkMode = body.classList.contains('dark');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            updateThemeIcons(isDarkMode);
+        }
+
+        function updateThemeIcons(isDarkMode) {
+            if (isDarkMode) {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+        }
+
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const isDarkMode = (savedTheme === 'dark' || !savedTheme);
+            if (isDarkMode) {
+                body.classList.add('dark');
+            } else {
+                body.classList.remove('dark');
+            }
+            updateThemeIcons(isDarkMode);
+        }
+
+        // --- Image Preloading Function ---
+        function preloadImages(imageUrls) {
+            imageUrls.forEach(url => {
+                // Check if it's an image before trying to preload as image
+                const mediaItem = mediaItems.find(item => item.src === url);
+                if (mediaItem && mediaItem.type === 'image') {
+                    const img = new Image();
+                    img.src = url;
+                    img.onerror = () => {
+                        console.warn(`Preload failed for: ${url}. Please verify path and filename.`);
+                    };
+                }
+            });
+        }
+        // --- End Image Preloading Function ---
+
+        // Modified keydown listener for Escape and directing input
+        document.addEventListener('keydown', (event) => {
+            const isSearchInputFocused = (document.activeElement === searchInput);
+
+            // If Escape key is pressed, clear and unfocus the search input
+            if (event.key === 'Escape') {
+                searchInput.value = '';
+                searchInput.blur(); // Unfocus the search input
+                event.preventDefault(); // Prevent any default browser behavior for Escape
+                return; // Exit the function to prevent further processing
+            }
+
+            // If a printable character, Backspace, or Enter is pressed,
+            // and the search input is NOT the active element, direct input to searchInput
+            // If it IS the active element, allow default input behavior.
+            if (!isSearchInputFocused &&
+                (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey)) { // Printable characters
+                
+                searchInput.focus();    // Focus the search bar
+                // Let the browser handle adding the character since it's now focused.
+                // No event.preventDefault() here unless we want to block default input entirely for some reason.
+            } else if (!isSearchInputFocused && event.key === 'Backspace') {
+                searchInput.focus();
+                // Let the browser handle backspace since it's now focused.
+            } else if (!isSearchInputFocused && event.key === 'Enter') {
+                searchInput.focus();
+                event.preventDefault(); // Prevent default form submission or other actions
+                console.log('Search triggered with:', searchInput.value);
+            } else if (isSearchInputFocused && event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission or other actions
+                console.log('Search triggered from focused input with:', searchInput.value);
+            } else if (!isSearchInputFocused) {
+                // Only allow gallery navigation if the search input is not focused
+                if (event.key === 'ArrowLeft') {
+                    previousMedia();
+                } else if (event.key === 'ArrowRight') {
+                    nextMedia();
+                }
+            }
+        });
+
+        // Event listener for clicks anywhere on the document to unfocus search bar
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            // Check if the click was NOT on the search input, and NOT on the search button,
+            // and NOT within the search container itself (to catch clicks on its padding/margins)
+            if (target !== searchInput && target !== searchButton && !searchContainer.contains(target)) {
+                searchInput.blur(); // Unfocus the search input
+            }
+        });
+
+
+        prevArrow.addEventListener('click', (e) => {
+            e.stopPropagation();
+            previousMedia();
+        });
+        nextArrow.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nextMedia();
+        });
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Add scrollwheel functionality
+        galleryContainer.addEventListener('wheel', (event) => {
+            event.preventDefault(); // Prevent default page scrolling
+
+            if (event.deltaY < 0) {
+                // Scroll up
+                previousMedia();
+            } else if (event.deltaY > 0) {
+                // Scroll down
+                nextMedia();
+            }
+        });
+
+        galleryContainer.addEventListener('click', (event) => {
+            const currentMediaElement = galleryContainer.querySelector('img, video');
+
+            if (currentMediaElement) {
+                const mediaRect = currentMediaElement.getBoundingClientRect();
+                const clickX = event.clientX - mediaRect.left;
+
+                if (clickX < mediaRect.width / 2) {
+                    previousMedia();
+                } else {
+                    nextMedia();
+                }
+            } else if (event.target === galleryContainer || event.target.classList.contains('initial-message')) {
+                const containerWidth = galleryContainer.offsetWidth;
+                const clickX = event.clientX - galleryContainer.getBoundingClientRect().left;
+
+                if (clickX < containerWidth / 2) {
+                    previousMedia();
+                } else {
+                    nextMedia();
+                }
+            }
+        });
+
+        // Event listeners for submenu hover
+        appName.addEventListener('mouseenter', () => {
+            themeSubmenu.classList.add('show');
+        });
+
+        appName.addEventListener('mouseleave', () => {
+            themeSubmenu.classList.remove('show');
+        });
+
+        window.onload = function() {
+            applySavedTheme();
+            createThumbnails();
+            displayMedia(0);
+            // Call preloadImages after initial display
+            preloadImages(mediaItems.map(item => item.src));
+        };
+    </script>
+</body>
+</html>
