@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mbed</title>
+    <title>mBed</title>
     <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /* Define CSS variables for consistent heights */
         :root {
-            --nav-height-desktop: 5rem; /* Base height for thumbnails + padding */
-            --nav-height-mobile: 4.5rem; /* Adjusted for mobile padding */
+            --nav-height-desktop: 5rem; /* Reverted: Base height for thumbnails + padding */
+            --nav-height-mobile: 4.5rem; /* Reverted: Adjusted for mobile padding */
         }
 
         html, body {
@@ -149,12 +149,25 @@
             border-radius: 0; /* No rounded corners for the gallery container in dark mode */
         }
 
-        /* Styling for ALL media elements (images and videos) within gallery-container */
-        #galleryContainer img, #galleryContainer video {
+        /* Styling for the main media display area */
+        #mainMediaDisplayArea {
+            position: absolute; /* Position it absolutely within galleryContainer */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex; /* Use flex to center its content */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+            z-index: 1; /* Ensure it's below arrows and tags, but above background */
+        }
+
+        /* Styling for ALL media elements (images and videos) within mainMediaDisplayArea */
+        #mainMediaDisplayArea img, #mainMediaDisplayArea video {
             display: block;
             width: auto; /* Allow natural width */
-            height: auto; /* Allow natural height */
-            max-width: 100%; /* Scale down if wider than container */
+            height: auto; /* Allow natural height, maintaining aspect ratio */
+            max-width: 100%; /* Ensure it doesn't exceed 100% of parent */
             max-height: 100%; /* Scale down if taller than container */
             border-radius: 0;
             object-fit: contain; /* Ensure entire media is visible, scaling down if needed */
@@ -183,8 +196,8 @@
             padding: 0 1rem; /* Add some horizontal padding to wrapper */
         }
         .thumbnail-item {
-            width: 5rem; /* Fixed thumbnail width */
-            height: 3.5rem; /* Fixed thumbnail height */
+            width: 5rem; /* Reverted: Fixed thumbnail width */
+            height: 3.5rem; /* Reverted: Fixed thumbnail height */
             border-radius: 0.75rem; /* Rounded thumbnails */
             cursor: pointer;
             overflow: hidden;
@@ -342,34 +355,118 @@
 
         /* Styling for the new gallery name button */
         #galleryNameButton {
-            background-color: #9ca3af; /* A light gray */
-            color: #1f2937; /* Dark gray text */
+            background-color: #8b5cf6; /* Dark purple */
+            color: white; /* White text for contrast */
             padding: 0 0.75rem;
             font-size: 0.875rem;
             font-weight: 600;
             border-radius: 0.5rem;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100px; /* Adjust max width as needed */
         }
         #galleryNameButton:hover {
-            background-color: #6b7280; /* Darker gray on hover */
+            background-color: #7c3aed; /* Even darker purple on hover */
         }
         body.dark #galleryNameButton {
-            background-color: #6b7280; /* Darker gray in dark mode */
-            color: #e5e7eb; /* Light text in dark mode */
+            background-color: #8b5cf6; /* Consistent dark purple in dark mode */
+            color: white; /* White text in dark mode */
         }
         body.dark #galleryNameButton:hover {
-            background-color: #4b5563; /* Even darker on hover in dark mode */
+            background-color: #7c3aed; /* Darker on hover in dark mode */
+        }
+
+        /* New styles for the tags display container */
+        #tagsDisplay {
+            position: absolute; /* Position relative to galleryContainer */
+            left: 1rem; /* Adjust from left edge */
+            top: 1rem; /* Start from top-left */
+            display: flex;
+            flex-direction: column; /* Tags stack vertically */
+            gap: 0.5rem; /* Space between tags */
+            z-index: 5; /* Ensure tags are above the image but below arrows */
+            pointer-events: none; /* Allow clicks to pass through to underlying elements */
+        }
+
+        /* Style for individual tag pills (now buttons) */
+        .tag-pill {
+            /* Match mBed logo button styles */
+            background-color: #cfd8dc; /* mBed logo background color for light mode */
+            color: #4b5563; /* mBed logo text color for light mode */
+            padding: 0.25rem 0.75rem; /* Vertical and horizontal padding */
+            border-radius: 9999px; /* Full rounded corners (pill shape) */
+            font-size: 0.75rem; /* Smaller font size */
+            white-space: nowrap; /* Prevent tag text from wrapping */
+            backdrop-filter: blur(4px); /* Subtle blur effect */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+            cursor: pointer; /* Indicate it's clickable */
+            border: none; /* Remove default button border */
+            pointer-events: auto; /* Re-enable pointer events for clicks */
+        }
+        body.dark .tag-pill {
+            background-color: #4b5563; /* mBed logo background color for dark mode */
+            color: #cbd5e1; /* mBed logo text color for dark mode */
+        }
+        .tag-pill:hover {
+            background-color: #b0bec5; /* Darker on hover for light mode */
+        }
+        body.dark .tag-pill:hover {
+            background-color: #607d8b; /* Darker on hover for dark mode */
+        }
+
+        /* Styles for the new tag gallery view (Responsive Grid) */
+        #tagGalleryView {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 1rem;
+            overflow-y: auto; /* Enable scrolling for many thumbnails */
+            background-color: #FFFFFF; /* Changed to white for light theme */
+            color: #1f2937; /* Dark text for readability on light background */
+            box-sizing: border-box; /* Include padding in dimensions */
+
+            display: grid; /* Changed back to grid */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Larger flexible thumbnails */
+            gap: 1rem; /* Increased gap for better spacing */
+            justify-items: center; /* Center items in their cells */
+            align-items: start; /* Align items to the top of their cells */
+        }
+        body.dark #tagGalleryView {
+            background-color: #000000; /* Ensured black for dark mode too */
+            color: #e5e7eb;
+        }
+
+        /* Styling for thumbnails within the tag gallery */
+        .tag-gallery-thumbnail {
+            width: 100%; /* Take full width of its grid cell */
+            height: auto; /* Allow natural height to maintain aspect ratio */
+            object-fit: contain; /* Ensure entire image is visible without cropping */
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .tag-gallery-thumbnail:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+        body.dark .tag-gallery-thumbnail {
+            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+        }
+        body.dark .tag-gallery-thumbnail:hover {
+            box-shadow: 0 8px 12px rgba(255, 255, 255, 0.2);
         }
 
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
             :root {
-                --nav-height-desktop: 4.5rem; /* Update variable for mobile */
+                --nav-height-desktop: 4.5rem; /* Reverted: Update variable for mobile */
             }
             .gallery-container {
                 width: 100%; /* Take full width of parent (body) */
@@ -382,8 +479,8 @@
                  max-height: 100%; /* Adjust based on new padding */
             }
             .thumbnail-item {
-                width: 4rem;
-                height: 2.8rem;
+                width: 4rem; /* Reverted */
+                height: 2.8rem; /* Reverted (maintaining aspect ratio 7:5) */
                 margin-bottom: 0.5rem; /* Add some vertical spacing */
             }
             .nav-thumbnails {
@@ -436,11 +533,19 @@
                 justify-content: center; /* Center items */
                 margin-bottom: 0.5rem; /* Space before thumbnails */
             }
+            #tagsDisplay {
+                left: 0.5rem; /* Reduce left margin on mobile */
+                gap: 0.25rem; /* Reduce gap between tags on mobile */
+            }
+            .tag-pill {
+                padding: 0.2rem 0.6rem; /* Smaller padding on mobile */
+                font-size: 0.65rem; /* Even smaller font size on mobile */
+            }
         }
         @media (max-width: 480px) {
             .thumbnail-item {
-                width: 3.5rem;
-                height: 2.5rem;
+                width: 3.5rem; /* Reverted */
+                height: 2.5rem; /* Reverted */
             }
             .nav-thumbnails {
                 border-top-left-radius: 0 !important;
@@ -463,12 +568,25 @@
 </head>
 <body>
     <div id="galleryContainer" class="gallery-container">
-        <!-- Media (image or video) will be dynamically loaded here directly into gallery-container -->
-        <p class="initial-message text-gray-400">Loading media...</p>
+        <!-- Main Image/Video Display Area -->
+        <div id="mainMediaDisplayArea">
+             <p class="initial-message text-gray-400">Loading media...</p>
+        </div>
+
+        <!-- Container for tags, absolutely positioned on the left -->
+        <div id="tagsDisplay">
+            <!-- Tags will be dynamically loaded here -->
+        </div>
 
         <!-- Navigation Arrows (for visual click, primarily for keyboard) -->
         <div id="prevArrow" class="arrow-button arrow-left">‹</div>
         <div id="nextArrow" class="arrow-button arrow-right">›</div>
+
+        <!-- New Tag Gallery View (Hidden by default) -->
+        <div id="tagGalleryView">
+            <h2 id="tagGalleryTitle" class="text-lg font-semibold mb-4 text-white col-span-full"></h2>
+            <!-- Filtered thumbnails will be loaded here -->
+        </div>
     </div>
 
     <!-- Thumbnail Navigation Bar -->
@@ -477,7 +595,7 @@
         <div class="flex-grow flex justify-start items-center">
             <div class="navbar-button-group-left flex items-center">
                 <div class="app-name">
-                    mbed
+                    mBed
                     <div id="themeSubmenu" class="submenu-container">
                         <!-- Dark Mode Toggle Button moved inside submenu -->
                         <button id="themeToggle" class="theme-toggle">
@@ -499,11 +617,11 @@
                         </button>
                     </div>
                 </div>
-                <!-- First horizontal line connecting "mbed" to "Art" -->
+                <!-- First horizontal line connecting "mBed" to "Art" -->
                 <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
                 <!-- Gallery Name button -->
-                <button id="galleryNameButton" class="h-[46px] px-3 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors duration-200 text-sm font-semibold">
-                    Art
+                <button id="galleryNameButton" class="h-[46px] px-3 py-2 rounded-md transition-colors duration-200 text-sm font-semibold">
+                    Paintings
                 </button>
                 <!-- Second horizontal line connecting "Art" to media name -->
                 <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
@@ -538,19 +656,23 @@
         // as your index.html file, or in a subfolder relative to it.
         // Direct absolute paths like C:\Users\... will NOT work due to browser security.
         const mediaItems = [
-            { src: 'Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg', type: 'image', alt: 'Mona Lisa by Leonardo da Vinci', name: 'Mona Lisa' },
-            { src: 'Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', type: 'image', alt: 'The Starry Night by Vincent van Gogh', name: 'The Starry Night' },
-            { src: 'Gustav_Klimt_046.jpg', type: 'image', alt: 'Portrait of Adele Bloch-Bauer I by Gustav Klimt', name: 'Adele Bloch-Bauer I' },
-            { src: 'The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg', type: 'image', alt: 'The Kiss by Gustav Klimt', name: 'The Kiss' },
-            { src: 'Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg', type: 'image', alt: 'The Scream by Edvard Munch', name: 'The Scream' },
-            { src: 'Grant_Wood_-_American_Gothic_-_Google_Art_Project.jpg', type: 'image', alt: 'American Gothic by Grant Wood', name: 'American Gothic' },
-            { src: 'GirlBeforeAMirror.jpg', type: 'image', alt: 'Girl Before a Mirror by Pablo Picasso', name: 'Girl Before a Mirror' },
-            { src: 'Las_Meninas,_by_Diego_Velázquez,_from_Prado_in_Google_Earth.jpg', type: 'image', alt: 'Las Meninas by Diego Velázquez', name: 'Las Meninas' } // Corrected filename
+            { src: 'Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg', type: 'image', alt: 'Mona Lisa by Leonardo da Vinci', name: 'Mona Lisa', tags: ['Art', 'Renaissance', 'Painting', 'Leonardo da Vinci'] },
+            { src: 'Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', type: 'image', alt: 'The Starry Night by Vincent van Gogh', name: 'The Starry Night', tags: ['Art', 'Post-Impressionism', 'Painting', 'Landscape', 'Vincent Van Gogh'] },
+            { src: 'Gustav_Klimt_046.jpg', type: 'image', alt: 'Portrait of Adele Bloch-Bauer I by Gustav Klimt', name: 'Adele Bloch-Bauer I', tags: ['Art', 'Symbolism', 'Painting', 'Portrait', 'Gustav Klimt'] },
+            { src: 'The_Last_Supper_-_Leonardo_Da_Vinci_-_High_Resolution_32x16.jpg', type: 'image', alt: 'The Last Supper by Leonardo da Vinci', name: 'The Last Supper', tags: ['Art', 'Renaissance', 'Painting', 'Religious', 'Leonardo da Vinci'] },
+            { src: 'The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg', type: 'image', alt: 'The Kiss by Gustav Klimt', name: 'The Kiss', tags: ['Art', 'Symbolism', 'Painting', 'Gustav Klimt'] },
+            { src: 'Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg', type: 'image', alt: 'The Scream by Edvard Munch', name: 'The Scream', tags: ['Art', 'Expressionism', 'Painting', 'Edvard Munch'] },
+            { src: 'Grant_Wood_-_American_Gothic_-_Google_Art_Project.jpg', type: 'image', alt: 'American Gothic by Grant Wood', name: 'American Gothic', tags: ['Art', 'Regionalism', 'Painting', 'Portrait', 'Grant Wood'] },
+            { src: 'GirlBeforeAMirror.jpg', type: 'image', alt: 'Girl Before a Mirror by Pablo Picasso', name: 'Girl Before a Mirror', tags: ['Art', 'Cubism', 'Painting', 'Portrait', 'Pablo Picasso'] },
+            { src: 'Las_Meninas,_by_Diego_Velázquez,_from_Prado_in_Google_Earth.jpg', type: 'image', alt: 'Las Meninas by Diego Velázquez', name: 'Las Meninas', tags: ['Art', 'Baroque', 'Painting', 'Portrait', 'Diego Velázquez'] },
+            { src: 'Vincent_Van_Gogh_-_Three_Sunflowers_F453.jpg', type: 'image', alt: 'Three Sunflowers by Vincent van Gogh', name: 'Three Sunflowers', tags: ['Art', 'Still Life', 'Painting', 'Vincent Van Gogh'] },
+            { src: 'Frank_Weston_Benson,_The_Dining_Room_Table,_1919.jpg', type: 'image', alt: 'The Dining Room Table by Frank Weston Benson', name: 'The Dining Room Table', tags: ['Art', 'American Impressionism', 'Painting', 'Still Life', 'Frank Weston Benson'] }
         ];
 
         let currentMediaIndex = 0;
         const body = document.body;
         const galleryContainer = document.getElementById('galleryContainer');
+        const mainMediaDisplayArea = document.getElementById('mainMediaDisplayArea');
         const thumbnailNav = document.getElementById('thumbnailNav');
         const thumbnailWrapper = document.getElementById('thumbnailWrapper');
         const prevArrow = document.getElementById('prevArrow');
@@ -558,74 +680,185 @@
         const themeToggle = document.getElementById('themeToggle');
         const sunIcon = themeToggle.querySelector('.sun-icon');
         const moonIcon = themeToggle.querySelector('.moon-icon');
-        const appName = document.querySelector('.app-name'); // Get the app-name div
-        const themeSubmenu = document.getElementById('themeSubmenu'); // Get the new submenu container
-        const searchInput = document.getElementById('searchInput'); // Get the search input
-        const searchContainer = document.querySelector('.search-container'); // Get the search container
-        const searchButton = document.getElementById('searchButton'); // Get the search button
-        const mediaNameButton = document.getElementById('mediaNameButton'); // Get the new media name button
-        const galleryNameButton = document.getElementById('galleryNameButton'); // Get the new gallery name button
+        const appName = document.querySelector('.app-name');
+        const themeSubmenu = document.getElementById('themeSubmenu');
+        const searchInput = document.getElementById('searchInput');
+        const searchContainer = document.querySelector('.search-container');
+        const searchButton = document.getElementById('searchButton');
+        const mediaNameButton = document.getElementById('mediaNameButton');
+        const galleryNameButton = document.getElementById('galleryNameButton');
+        const tagsDisplay = document.getElementById('tagsDisplay');
+        const tagGalleryView = document.getElementById('tagGalleryView');
+        const tagGalleryTitle = document.getElementById('tagGalleryTitle');
 
 
-        // Function to display the selected media
+        // Function to display the selected media (main single image view)
         function displayMedia(index) {
+            console.log(`[displayMedia] Called with requested index: ${index}`);
+            // Ensure mainMediaDisplayArea is visible and tagGalleryView is hidden
+            mainMediaDisplayArea.style.display = 'flex';
+            tagGalleryView.style.display = 'none';
+
+            // Show arrows and tags for main view
+            prevArrow.style.display = 'block';
+            nextArrow.style.display = 'block';
+            tagsDisplay.style.display = 'flex';
+
+
             if (index < 0) {
                 index = mediaItems.length - 1;
+                console.log(`[displayMedia] Adjusted index to (loop-around): ${index}`);
             } else if (index >= mediaItems.length) {
                 index = 0;
+                console.log(`[displayMedia] Adjusted index to (loop-around): ${index}`);
             }
             currentMediaIndex = index;
 
-            const existingMedia = galleryContainer.querySelector('img, video');
-            if (existingMedia) {
-                galleryContainer.removeChild(existingMedia);
+            // Clear ONLY the content of the dedicated mainMediaDisplayArea
+            while (mainMediaDisplayArea.firstChild) {
+                mainMediaDisplayArea.removeChild(mainMediaDisplayArea.firstChild);
             }
-            const initialMessage = galleryContainer.querySelector('.initial-message');
-            if (initialMessage) {
-                galleryContainer.removeChild(initialMessage);
-            }
+            console.log(`[displayMedia] Ensured mainMediaDisplayArea is empty by removing all children.`);
 
             const item = mediaItems[currentMediaIndex];
+            console.log(`[displayMedia] Will now attempt to display: "${item.name}" at currentMediaIndex: ${currentMediaIndex}`);
             let mediaElement;
 
             if (item.type === 'image') {
                 mediaElement = document.createElement('img');
                 mediaElement.src = item.src;
                 mediaElement.alt = item.alt;
-                // Added an onerror handler for local files for better feedback
+                mediaElement.onload = () => {
+                    // No class added for opacity, it's 1 by default
+                };
                 mediaElement.onerror = (e) => {
-                    console.error(`Error loading image: ${item.src}. Please ensure the file exists and the path is correct.`);
-                    // Only set placeholder if the original load failed
+                    console.error(`[displayMedia] Error loading image: ${item.src}. Please ensure the file exists and the path is correct.`);
                     if (!e.target.dataset.placeholderSet) {
                         e.target.src = `https://placehold.co/1280x720/cccccc/000000?text=Image+Load+Error`;
                         e.target.alt = 'Image failed to load (check path)';
-                        e.target.dataset.placeholderSet = 'true'; // Mark that placeholder has been set
+                        e.target.dataset.placeholderSet = 'true';
                     }
                 };
             } else if (item.type === 'video') {
-                // Assuming no local video files based on current mediaItems, but keeping structure for future
                 mediaElement = document.createElement('video');
                 mediaElement.src = item.src;
                 mediaElement.controls = true;
                 mediaElement.autoplay = true;
                 mediaElement.loop = true;
                 mediaElement.alt = item.alt;
+                mediaElement.onloadeddata = () => {
+                    // No class added for opacity
+                };
                 mediaElement.onerror = (e) => {
-                    console.error(`Error loading video: ${item.src}. Please ensure the file exists and the path is correct.`);
+                    console.error(`[displayMedia] Error loading video: ${item.src}. Please ensure the file exists and the path is correct.`);
                     const errorMessage = document.createElement('p');
                     errorMessage.classList.add('text-red-500', 'text-center');
                     errorMessage.textContent = 'Video failed to load (check path).';
-                    galleryContainer.insertBefore(errorMessage, prevArrow);
+                    mainMediaDisplayArea.appendChild(errorMessage);
                 };
             }
 
             if (mediaElement) {
-                galleryContainer.insertBefore(mediaElement, prevArrow);
+                mainMediaDisplayArea.appendChild(mediaElement);
+                console.log(`[displayMedia] Successfully appended new media element with src: ${mediaElement.src} to mainMediaDisplayArea.`);
             }
 
+
             updateThumbnailHighlight();
-            // Update the new media name button text to use the 'name' property
             mediaNameButton.textContent = item.name || 'Untitled Media';
+            displayTags(item.tags); // Display tags for the current item
+        }
+
+        // Function to perform search and display filtered results in the tag gallery view
+        function performSearch(query) {
+            console.log(`[performSearch] Called with query: "${query}"`);
+
+            if (!query || query.trim() === '') {
+                // If query is empty, revert to main gallery view
+                console.log(`[performSearch] Query is empty, reverting to main gallery.`);
+                displayMedia(currentMediaIndex); // Show the currently selected media
+                return;
+            }
+
+            // Hide main gallery elements
+            mainMediaDisplayArea.style.display = 'none';
+            prevArrow.style.display = 'none';
+            nextArrow.style.display = 'none';
+            tagsDisplay.style.display = 'none';
+
+            // Set the title for the tag gallery view
+            tagGalleryTitle.textContent = `Results for: "${query}"`;
+            console.log(`[performSearch] Setting tag gallery title to: "${tagGalleryTitle.textContent}"`);
+
+            // Show tag gallery view
+            tagGalleryView.style.display = 'grid'; // Ensure it's grid for responsive layout
+
+            // Clear previous content in tag gallery view except for the title
+            let currentChildren = Array.from(tagGalleryView.children);
+            currentChildren.forEach(child => {
+                if (child !== tagGalleryTitle) {
+                    child.remove();
+                }
+            });
+            console.log('[performSearch] Cleared previous tag gallery content.');
+
+            const lowerCaseQuery = query.toLowerCase();
+            const filteredItems = mediaItems.filter(item => {
+                const matchesName = item.name && item.name.toLowerCase().includes(lowerCaseQuery);
+                const matchesTag = item.tags && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery));
+                return matchesName || matchesTag;
+            });
+            console.log(`[performSearch] Found ${filteredItems.length} items for query "${query}".`);
+
+            if (filteredItems.length === 0) {
+                const noResultsMessage = document.createElement('p');
+                noResultsMessage.textContent = `No items found matching: "${query}"`;
+                noResultsMessage.classList.add('text-center', 'text-gray-500', 'col-span-full', 'py-8');
+                tagGalleryView.appendChild(noResultsMessage);
+                console.log(`[performSearch] No items found, displaying message.`);
+                return;
+            }
+
+            // Ensure title is first child
+            if (tagGalleryView.firstChild !== tagGalleryTitle) {
+                tagGalleryView.prepend(tagGalleryTitle);
+                console.log('[performSearch] Prepended tag gallery title.');
+            }
+
+            filteredItems.forEach((item, index) => {
+                const thumbnailWrapper = document.createElement('div');
+                thumbnailWrapper.classList.add('relative', 'group', 'overflow-hidden', 'rounded-lg', 'shadow-md'); /* Container for each thumbnail */
+
+                const img = document.createElement('img');
+                img.src = item.src;
+                img.alt = item.alt;
+                img.classList.add('tag-gallery-thumbnail'); // Apply new styling
+                img.onerror = (e) => {
+                    console.error(`[performSearch] Error loading tag gallery thumbnail: ${item.src}.`);
+                    if (!e.target.dataset.placeholderSet) {
+                        e.target.src = `https://placehold.co/200x150/cccccc/000000?text=Thumb+Error`;
+                        e.target.dataset.placeholderSet = 'true';
+                    }
+                };
+
+                const titleOverlay = document.createElement('div');
+                titleOverlay.classList.add('absolute', 'bottom-0', 'left-0', 'right-0', 'bg-gradient-to-t', 'from-black', 'to-transparent', 'text-white', 'p-2', 'text-sm', 'font-semibold', 'opacity-0', 'group-hover:opacity-100', 'transition-opacity', 'duration-300');
+                titleOverlay.textContent = item.name;
+
+                thumbnailWrapper.appendChild(img);
+                thumbnailWrapper.appendChild(titleOverlay);
+
+                // Add click listener to display the selected item in the main gallery
+                thumbnailWrapper.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent event from bubbling up to galleryContainer
+                    const originalIndex = mediaItems.indexOf(item);
+                    console.log(`[performSearch - thumbnailClick] Clicked thumbnail for item: "${item.name}", its original index is: ${originalIndex}`);
+                    searchInput.value = ''; // Clear search bar
+                    displayMedia(originalIndex); // Display the selected media
+                });
+
+                tagGalleryView.appendChild(thumbnailWrapper);
+            });
         }
 
         function updateThumbnailHighlight() {
@@ -649,6 +882,7 @@
         }
 
         function createThumbnails() {
+            thumbnailWrapper.innerHTML = ''; // Clear existing thumbnails
             mediaItems.forEach((item, index) => {
                 const thumbnailDiv = document.createElement('div');
                 thumbnailDiv.classList.add('thumbnail-item');
@@ -676,9 +910,30 @@
                 thumbnailDiv.addEventListener('click', (e) => {
                     e.stopPropagation();
                     displayMedia(index);
+                    searchInput.value = ''; // Clear search bar
                 });
                 thumbnailWrapper.appendChild(thumbnailDiv);
             });
+        }
+
+        // Modified function to display tags as clickable buttons
+        function displayTags(tags) {
+            tagsDisplay.innerHTML = ''; // Clear previous tags
+            tagsDisplay.style.display = 'flex'; // Ensure tags are visible for the main view
+
+            if (tags && tags.length > 0) {
+                tags.forEach(tagText => {
+                    const tagButton = document.createElement('button');
+                    tagButton.classList.add('tag-pill');
+                    tagButton.textContent = tagText;
+                    tagButton.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        searchInput.value = tagText; // Populate search bar
+                        performSearch(tagText); // Trigger search immediately
+                    });
+                    tagsDisplay.appendChild(tagButton);
+                });
+            }
         }
 
         function toggleTheme() {
@@ -712,7 +967,6 @@
         // --- Image Preloading Function ---
         function preloadImages(imageUrls) {
             imageUrls.forEach(url => {
-                // Check if it's an image before trying to preload as image
                 const mediaItem = mediaItems.find(item => item.src === url);
                 if (mediaItem && mediaItem.type === 'image') {
                     const img = new Image();
@@ -729,35 +983,29 @@
         document.addEventListener('keydown', (event) => {
             const isSearchInputFocused = (document.activeElement === searchInput);
 
-            // If Escape key is pressed, clear and unfocus the search input
             if (event.key === 'Escape') {
                 searchInput.value = '';
-                searchInput.blur(); // Unfocus the search input
-                event.preventDefault(); // Prevent any default browser behavior for Escape
-                return; // Exit the function to prevent further processing
+                searchInput.blur();
+                performSearch(''); // Clear search results immediately
+                event.preventDefault();
+                return;
             }
 
-            // If a printable character, Backspace, or Enter is pressed,
-            // and the search input is NOT the active element, direct input to searchInput
-            // If it IS the active element, allow default input behavior.
             if (!isSearchInputFocused &&
-                (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey)) { // Printable characters
-                
-                searchInput.focus();    // Focus the search bar
-                // Let the browser handle adding the character since it's now focused.
-                // No event.preventDefault() here unless we want to block default input entirely for some reason.
+                (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey)) {
+                searchInput.focus();
             } else if (!isSearchInputFocused && event.key === 'Backspace') {
                 searchInput.focus();
-                // Let the browser handle backspace since it's now focused.
             } else if (!isSearchInputFocused && event.key === 'Enter') {
                 searchInput.focus();
-                event.preventDefault(); // Prevent default form submission or other actions
+                event.preventDefault();
                 console.log('Search triggered with:', searchInput.value);
             } else if (isSearchInputFocused && event.key === 'Enter') {
-                event.preventDefault(); // Prevent default form submission or other actions
+                event.preventDefault();
+                performSearch(searchInput.value); // Trigger search on Enter
                 console.log('Search triggered from focused input with:', searchInput.value);
-            } else if (!isSearchInputFocused) {
-                // Only allow gallery navigation if the search input is not focused
+            } else if (!isSearchInputFocused && tagGalleryView.style.display === 'none') {
+                // Only allow gallery navigation if the search input is not focused AND tagGalleryView is not active
                 if (event.key === 'ArrowLeft') {
                     previousMedia();
                 } else if (event.key === 'ArrowRight') {
@@ -769,21 +1017,32 @@
         // Event listener for clicks anywhere on the document to unfocus search bar
         document.addEventListener('click', (event) => {
             const target = event.target;
-            // Check if the click was NOT on the search input, and NOT on the search button,
-            // and NOT within the search container itself (to catch clicks on its padding/margins)
             if (target !== searchInput && target !== searchButton && !searchContainer.contains(target)) {
-                searchInput.blur(); // Unfocus the search input
+                searchInput.blur();
             }
         });
 
+        // Add real-time search on input
+        searchInput.addEventListener('input', () => {
+            performSearch(searchInput.value);
+        });
 
         prevArrow.addEventListener('click', (e) => {
             e.stopPropagation();
-            previousMedia();
+            if (tagGalleryView.style.display === 'none') { // Only navigate if in main view
+                previousMedia();
+            }
         });
         nextArrow.addEventListener('click', (e) => {
             e.stopPropagation();
-            nextMedia();
+            if (tagGalleryView.style.display === 'none') { // Only navigate if in main view
+                nextMedia();
+            }
+        });
+
+        searchButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            performSearch(searchInput.value);
         });
 
         themeToggle.addEventListener('click', toggleTheme);
@@ -791,36 +1050,39 @@
         // Add scrollwheel functionality
         galleryContainer.addEventListener('wheel', (event) => {
             event.preventDefault(); // Prevent default page scrolling
-
-            if (event.deltaY < 0) {
-                // Scroll up
-                previousMedia();
-            } else if (event.deltaY > 0) {
-                // Scroll down
-                nextMedia();
+            if (tagGalleryView.style.display === 'none') { // Only navigate if in main view
+                if (event.deltaY < 0) {
+                    previousMedia();
+                } else if (event.deltaY > 0) {
+                    nextMedia();
+                }
             }
         });
 
         galleryContainer.addEventListener('click', (event) => {
-            const currentMediaElement = galleryContainer.querySelector('img, video');
+            // Only handle clicks for main media navigation if tagGalleryView is not active
+            if (tagGalleryView.style.display === 'none') {
+                // Change to target mainMediaDisplayArea for click logic
+                const currentMediaElement = mainMediaDisplayArea.querySelector('img, video');
 
-            if (currentMediaElement) {
-                const mediaRect = currentMediaElement.getBoundingClientRect();
-                const clickX = event.clientX - mediaRect.left;
+                if (currentMediaElement) {
+                    const mediaRect = currentMediaElement.getBoundingClientRect();
+                    const clickX = event.clientX - mediaRect.left;
 
-                if (clickX < mediaRect.width / 2) {
-                    previousMedia();
-                } else {
-                    nextMedia();
-                }
-            } else if (event.target === galleryContainer || event.target.classList.contains('initial-message')) {
-                const containerWidth = galleryContainer.offsetWidth;
-                const clickX = event.clientX - galleryContainer.getBoundingClientRect().left;
+                    if (clickX < mediaRect.width / 2) {
+                        previousMedia();
+                    } else {
+                        nextMedia();
+                    }
+                } else if (event.target === mainMediaDisplayArea || event.target.classList.contains('initial-message')) { // Check if click is directly on the area or message
+                    const containerWidth = mainMediaDisplayArea.offsetWidth;
+                    const clickX = event.clientX - mainMediaDisplayArea.getBoundingClientRect().left;
 
-                if (clickX < containerWidth / 2) {
-                    previousMedia();
-                } else {
-                    nextMedia();
+                    if (clickX < containerWidth / 2) {
+                        previousMedia();
+                    } else {
+                        nextMedia();
+                    }
                 }
             }
         });
