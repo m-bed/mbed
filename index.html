@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🛏mbed</title>
+    <title>mbed</title>
     <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -165,7 +165,8 @@
         .nav-thumbnails {
             padding: 0.75rem 1rem;
             display: flex;
-            justify-content: space-between; /* Pushes app name left, thumbnail wrapper right */
+            /* Changed to flex-start initially to let spacers control distribution */
+            justify-content: flex-start;
             align-items: center; /* Aligns items vertically in the center */
             flex-wrap: wrap; /* Allow thumbnails to wrap on smaller screens */
             width: 100%; /* Take full width */
@@ -175,7 +176,8 @@
         .thumbnail-wrapper {
             display: flex; /* Makes the wrapper a flex container */
             justify-content: center; /* Centers thumbnails horizontally within this wrapper */
-            flex-grow: 1; /* Allows this wrapper to take up available space */
+            flex-grow: 0; /* Do not grow, its position is controlled by spacers */
+            flex-shrink: 0; /* Do not shrink */
             gap: 0.75rem; /* Space between thumbnails */
             flex-wrap: wrap; /* Allow thumbnails to wrap */
             padding: 0 1rem; /* Add some horizontal padding to wrapper */
@@ -199,7 +201,7 @@
             object-fit: cover; /* Cover the thumbnail area */
             border-radius: 0.75rem;
         }
-.thumbnail-item:hover:not(.active) {
+        .thumbnail-item:hover:not(.active) {
             transform: translateY(-3px); /* Lift effect on hover */
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
@@ -316,7 +318,8 @@
             white-space: nowrap; /* Prevent text wrapping */
             overflow: hidden; /* Hide overflow text */
             text-overflow: ellipsis; /* Add ellipsis for overflow */
-            max-width: 150px; /* Limit width for long names */
+            /* Fixed width to prevent layout shifts */
+            width: 150px; /* Adjust this width as needed for your longest painting names */
         }
         #mediaNameButton:hover {
             background-color: #7c3aed; /* Darker purple on hover */
@@ -419,7 +422,7 @@
                 max-width: 80%; /* Limit max width */
             }
             #mediaNameButton {
-                max-width: 100px; /* Even smaller width on mobile */
+                width: 100px; /* Even smaller fixed width on mobile */
                 font-size: 0.75rem; /* Smaller font on mobile */
                 padding: 0 0.5rem;
             }
@@ -469,55 +472,63 @@
     </div>
 
     <!-- Thumbnail Navigation Bar -->
-    <div id="thumbnailNav" class="nav-thumbnails">
-        <div class="navbar-left-section flex items-center">
-            <div class="app-name">
-                mbed
-                <div id="themeSubmenu" class="submenu-container">
-                    <!-- Dark Mode Toggle Button moved inside submenu -->
-                    <button id="themeToggle" class="theme-toggle">
-                        <!-- SVG icons for theme toggle -->
-                        <svg class="sun-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="5"></circle>
-                            <line x1="12" y1="1" x2="12" y2="3"></line>
-                            <line x1="12" y1="21" x2="12" y2="23"></line>
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                            <line x1="1" y1="12" x2="3" y2="12"></line>
-                            <line x1="21" y1="12" x2="23" y2="12"></line>
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                        </svg>
-                        <svg class="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                        </svg>
-                    </button>
+    <div id="thumbnailNav" class="nav-thumbnails flex items-center">
+        <!-- Left content group with flexible spacer -->
+        <div class="flex-grow flex justify-start items-center">
+            <div class="navbar-button-group-left flex items-center">
+                <div class="app-name">
+                    mbed
+                    <div id="themeSubmenu" class="submenu-container">
+                        <!-- Dark Mode Toggle Button moved inside submenu -->
+                        <button id="themeToggle" class="theme-toggle">
+                            <!-- SVG icons for theme toggle -->
+                            <svg class="sun-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                            <svg class="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
+                <!-- First horizontal line connecting "mbed" to "Art" -->
+                <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
+                <!-- Gallery Name button -->
+                <button id="galleryNameButton" class="h-[46px] px-3 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors duration-200 text-sm font-semibold">
+                    Art
+                </button>
+                <!-- Second horizontal line connecting "Art" to media name -->
+                <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
+                <!-- Media name button -->
+                <button id="mediaNameButton" class="h-[46px] px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200 text-sm font-semibold">
+                    No Media Selected
+                </button>
             </div>
-            <!-- First horizontal line connecting "mbed" to "Art" -->
-            <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
-            <!-- New Gallery Name button -->
-            <button id="galleryNameButton" class="h-[46px] px-3 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors duration-200 text-sm font-semibold">
-                Art
-            </button>
-            <!-- Second horizontal line connecting "Art" to media name -->
-            <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
-            <!-- Media name button -->
-            <button id="mediaNameButton" class="h-[46px] px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200 text-sm font-semibold">
-                No Media Selected
-            </button>
         </div>
-        <div id="thumbnailWrapper" class="thumbnail-wrapper">
+
+        <!-- Thumbnail Wrapper (now explicitly centered relative to the overall navbar) -->
+        <div id="thumbnailWrapper" class="thumbnail-wrapper flex justify-center">
             <!-- Thumbnails will be dynamically loaded here -->
         </div>
-        <!-- Search Bar and Button -->
-        <div class="search-container flex items-center gap-2">
-            <input type="text" id="searchInput" placeholder="Search tags" class="px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-gray-800">
-            <button id="searchButton" class="px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                    <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
-                </svg>
-            </button>
+
+        <!-- Right content group with flexible spacer -->
+        <div class="flex-grow flex justify-end items-center">
+            <div class="search-container flex items-center gap-2">
+                <input type="text" id="searchInput" placeholder="Search tags" class="px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-gray-800">
+                <button id="searchButton" class="px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -833,4 +844,3 @@
     </script>
 </body>
 </html>
-
