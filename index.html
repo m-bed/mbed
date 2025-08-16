@@ -57,18 +57,33 @@
             background-color: rgba(255, 255, 255, 0.4); /* More opaque white on hover */
             opacity: 1 !important; /* Ensure hover on button overrides container hover */
         }
-        .theme-toggle {
+        /* Combined styling for theme toggle and info button within submenu */
+        .theme-toggle, .info-button {
             background-color: #e5e7eb;
             color: #1f2937;
+            border-radius: 0.5rem; /* Consistent rounded corners */
+            padding: 0.5rem 0.75rem; /* Consistent padding for button feel */
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Align text/icon to start */
+            width: 100%; /* Take full width of submenu */
+            font-weight: 500; /* Medium font weight */
+            text-align: left; /* Align text to left */
         }
-        .theme-toggle:hover {
+        .theme-toggle:hover, .info-button:hover {
             background-color: #d1d5db;
         }
-        .theme-toggle svg {
+        .theme-toggle svg, .info-button svg {
             fill: currentColor; /* Use current text color for SVG fill */
             width: 1.5rem; /* Icon size */
             height: 1.5rem; /* Icon size */
+            margin-right: 0.5rem; /* Space between icon and text */
+            flex-shrink: 0; /* Prevent icon from shrinking */
         }
+
         .app-name {
             font-weight: 700;
             font-size: 1.25rem;
@@ -105,11 +120,11 @@
             border: 3px solid #818cf8; /* Lighter purple border for active */
             box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.3); /* Lighter glow effect */
         }
-        body.dark .theme-toggle {
+        body.dark .theme-toggle, body.dark .info-button {
             background-color: #4b5563;
             color: #e5e7eb;
         }
-        body.dark .theme-toggle:hover {
+        body.dark .theme-toggle:hover, body.dark .info-button:hover {
             background-color: #6b7280;
         }
         body.dark .app-name {
@@ -277,25 +292,6 @@
             display: flex; /* Show instantly when 'show' class is added */
         }
 
-        /* Adjust theme toggle inside submenu */
-        .submenu-container .theme-toggle {
-            position: static; /* Remove absolute positioning */
-            border-radius: 0.5rem; /* Make it rectangular */
-            width: auto; /* Allow width to fit content */
-            height: auto; /* Adjust height based on content */
-            padding: 0.5rem; /* Reduced padding for smaller, icon-only button */
-            justify-content: center; /* Center the icon horizontally */
-            align-self: center; /* Center the button within the flex container */
-        }
-        .submenu-container .theme-toggle:hover {
-            background-color: #d1d5db; /* Light hover */
-        }
-        body.dark .submenu-container .theme-toggle:hover {
-            background-color: #6b7280; /* Dark hover */
-        }
-        .submenu-container .theme-toggle svg {
-            margin-right: 0; /* Remove space if no text */
-        }
 
         /* Search bar and button specific styling */
         .search-container input {
@@ -564,6 +560,67 @@
                 height: 1.2rem;
             }
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Above everything else */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #f7fafc; /* Light gray background */
+            color: #1f2937; /* Dark text */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        body.dark .modal-content { /* Ensure dark mode styles are only for content itself */
+            background-color: #2d3748; /* Darker background in dark mode */
+            color: #e5e7eb; /* Lighter text in dark mode */
+        }
+
+
+        .modal-close-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #4a5568;
+        }
+        body.dark .modal-close-button {
+            color: #cbd5e1;
+        }
+        .modal-close-button:hover {
+            color: #e53e3e; /* Red on hover */
+        }
     </style>
 </head>
 <body>
@@ -614,6 +671,14 @@
                             <svg class="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                             </svg>
+                            <span>Theme</span>
+                        </button>
+                        <!-- Information Button (NEW) -->
+                        <button id="infoButton" class="info-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437-.443 3.347.402a.75.75 0 0 0 1.06-1.06c-1.35-1.351-3.473-1.581-4.88-.679l-.04-.02V7.5a.75.75 0 0 0-1.5 0v2.25c0 .207.118.398.307.494Zm-.442 4.025a.75.75 0 0 0 .825.148 5.753 5.753 0 0 0 1.455-.293.75.75 0 0 0-.236-1.468 4.253 4.253 0 0 1-1.087.213.75.75 0 0 0-.584.897Z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Information</span>
                         </button>
                     </div>
                 </div>
@@ -640,13 +705,30 @@
         <!-- Right content group with flexible spacer -->
         <div class="flex-grow flex justify-end items-center">
             <div class="search-container flex items-center gap-2">
-                <input type="text" id="searchInput" placeholder="Search tags" class="px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-gray-800">
+                <input type="text" id="searchInput" placeholder="Search by tags or name" class="px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-gray-800">
                 <button id="searchButton" class="px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                         <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
                     </svg>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- The Modal HTML Structure -->
+    <div id="infoModalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h3 class="text-xl font-bold mb-4">About mBed Gallery</h3>
+            <p class="text-gray-700 dark:text-gray-300">
+                This is a simple media gallery application built with HTML, CSS (Tailwind CSS), and JavaScript.
+                It allows you to browse through a collection of images and videos,
+                toggle between light and dark themes, and search media by tags or name.
+            </p>
+            <p class="text-gray-700 dark:text-gray-300 mt-2">
+                Use the arrow keys or click the left/right sides of the media to navigate.
+                You can also use the thumbnail bar at the bottom.
+            </p>
         </div>
     </div>
 
@@ -690,6 +772,9 @@
         const tagsDisplay = document.getElementById('tagsDisplay');
         const tagGalleryView = document.getElementById('tagGalleryView');
         const tagGalleryTitle = document.getElementById('tagGalleryTitle');
+        const infoButton = document.getElementById('infoButton'); // NEW: Get info button
+        const infoModalOverlay = document.getElementById('infoModalOverlay'); // NEW: Get modal overlay
+        const modalCloseButton = infoModalOverlay.querySelector('.modal-close-button'); // NEW: Get modal close button
 
 
         // Function to display the selected media (main single image view)
@@ -984,13 +1069,29 @@
             const isSearchInputFocused = (document.activeElement === searchInput);
 
             if (event.key === 'Escape') {
-                searchInput.value = '';
-                searchInput.blur();
-                performSearch(''); // Clear search results immediately
-                event.preventDefault();
-                return;
+                // If modal is open, close it first
+                if (infoModalOverlay.classList.contains('show')) {
+                    infoModalOverlay.classList.remove('show');
+                    event.preventDefault();
+                    return;
+                }
+                // If search input has value or is focused, clear and unfocus
+                if (searchInput.value !== '' || isSearchInputFocused) {
+                    searchInput.value = '';
+                    searchInput.blur();
+                    performSearch(''); // Clear search results immediately
+                    event.preventDefault();
+                    return;
+                }
+                // If in tag gallery view, close it
+                if (tagGalleryView.style.display === 'grid') {
+                    displayMedia(currentMediaIndex); // Go back to main display
+                    event.preventDefault();
+                    return;
+                }
             }
 
+            // If not in search input, and a single character key is pressed or backspace, focus search input
             if (!isSearchInputFocused &&
                 (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey)) {
                 searchInput.focus();
@@ -1004,8 +1105,9 @@
                 event.preventDefault();
                 performSearch(searchInput.value); // Trigger search on Enter
                 console.log('Search triggered from focused input with:', searchInput.value);
-            } else if (!isSearchInputFocused && tagGalleryView.style.display === 'none') {
-                // Only allow gallery navigation if the search input is not focused AND tagGalleryView is not active
+            } else if (!isSearchInputFocused && tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) {
+                // Only allow gallery navigation if the search input is not focused,
+                // tagGalleryView is not active, AND modal is not open
                 if (event.key === 'ArrowLeft') {
                     previousMedia();
                 } else if (event.key === 'ArrowRight') {
@@ -1029,13 +1131,13 @@
 
         prevArrow.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (tagGalleryView.style.display === 'none') { // Only navigate if in main view
+            if (tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
                 previousMedia();
             }
         });
         nextArrow.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (tagGalleryView.style.display === 'none') { // Only navigate if in main view
+            if (tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
                 nextMedia();
             }
         });
@@ -1047,10 +1149,27 @@
 
         themeToggle.addEventListener('click', toggleTheme);
 
+        // NEW: Event listeners for Information Modal
+        infoButton.addEventListener('click', () => {
+            infoModalOverlay.classList.add('show');
+            themeSubmenu.classList.remove('show'); // Hide submenu when modal opens
+        });
+
+        modalCloseButton.addEventListener('click', () => {
+            infoModalOverlay.classList.remove('show');
+        });
+
+        infoModalOverlay.addEventListener('click', (event) => {
+            // Close modal when clicking outside the modal-content
+            if (event.target === infoModalOverlay) {
+                infoModalOverlay.classList.remove('show');
+            }
+        });
+
         // Add scrollwheel functionality
         galleryContainer.addEventListener('wheel', (event) => {
             event.preventDefault(); // Prevent default page scrolling
-            if (tagGalleryView.style.display === 'none') { // Only navigate if in main view
+            if (tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
                 if (event.deltaY < 0) {
                     previousMedia();
                 } else if (event.deltaY > 0) {
@@ -1060,8 +1179,8 @@
         });
 
         galleryContainer.addEventListener('click', (event) => {
-            // Only handle clicks for main media navigation if tagGalleryView is not active
-            if (tagGalleryView.style.display === 'none') {
+            // Only handle clicks for main media navigation if tagGalleryView is not active AND modal is not open
+            if (tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) {
                 // Change to target mainMediaDisplayArea for click logic
                 const currentMediaElement = mainMediaDisplayArea.querySelector('img, video');
 
