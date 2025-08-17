@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>mBed</title>
-    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -59,7 +58,7 @@
             opacity: 1 !important; /* Ensure hover on button overrides container hover */
         }
         /* Combined styling for theme toggle and info button within submenu */
-        .theme-toggle, .info-button {
+        .theme-toggle, .info-button, .add-file-button {
             background-color: #e5e7eb;
             color: #1f2937;
             border-radius: 0.5rem; /* Consistent rounded corners */
@@ -74,10 +73,10 @@
             font-weight: 500; /* Medium font weight */
             text-align: center; /* Center text if any, but now only icon */
         }
-        .theme-toggle:hover, .info-button:hover {
+        .theme-toggle:hover, .info-button:hover, .add-file-button:hover {
             background-color: #d1d5db;
         }
-        .theme-toggle svg, .info-button svg {
+        .theme-toggle svg, .info-button svg, .add-file-button svg {
             fill: currentColor; /* Use current text color for SVG fill */
             width: 1.5rem; /* Icon size */
             height: 1.5rem; /* Icon size */
@@ -121,11 +120,11 @@
             border: 3px solid #818cf8; /* Lighter purple border for active */
             box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.3); /* Lighter glow effect */
         }
-        body.dark .theme-toggle, body.dark .info-button {
+        body.dark .theme-toggle, body.dark .info-button, body.dark .add-file-button {
             background-color: #4b5563;
             color: #e5e7eb;
         }
-        body.dark .theme-toggle:hover, body.dark .info-button:hover {
+        body.dark .theme-toggle:hover, body.dark .dark .info-button:hover, body.dark .add-file-button:hover {
             background-color: #6b7280;
         }
         body.dark .app-name {
@@ -380,7 +379,7 @@
         }
 
 
-        /* Styling for the new horizontal connector line */
+        /* New styles for the horizontal connector line */
         .horizontal-connector-line {
             width: 1.5rem; /* Adjusted width for the horizontal line */
             height: 2px; /* Thin line */
@@ -402,6 +401,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100px; /* Adjust max width as needed */
+            display: flex; /* Use flex for icon alignment */
+            align-items: center; /* Center items vertically */
+            gap: 0.4rem; /* Spacing between text and icon */
         }
         #galleryNameButton:hover {
             background-color: #7c3aed; /* Even darker purple on hover */
@@ -413,6 +415,14 @@
         body.dark #galleryNameButton:hover {
             background-color: #7c3aed; /* Darker on hover in dark mode */
         }
+        /* Style for the padlock icon within galleryNameButton */
+        #galleryNameButton .padlock-icon {
+            fill: currentColor; /* Inherit color from parent button */
+            width: 1.1rem; /* Slightly smaller icon size */
+            height: 1.1rem; /* Slightly smaller icon size */
+            flex-shrink: 0; /* Prevent icon from shrinking */
+        }
+
 
         /* New styles for the tags display container */
         #tagsDisplay {
@@ -688,38 +698,27 @@
 </head>
 <body>
     <div id="galleryContainer" class="gallery-container">
-        <!-- Main Image/Video Display Area -->
         <div id="mainMediaDisplayArea">
              <p class="initial-message text-gray-400">Loading media...</p>
         </div>
 
-        <!-- Container for tags, absolutely positioned on the left -->
         <div id="tagsDisplay">
-            <!-- 'Tags' label will be inserted here by JavaScript -->
-            <!-- Tags will be dynamically loaded here -->
-        </div>
+            </div>
 
-        <!-- Navigation Arrows (for visual click, primarily for keyboard) -->
         <div id="prevArrow" class="arrow-button arrow-left">‹</div>
         <div id="nextArrow" class="arrow-button arrow-right">›</div>
 
-        <!-- New Tag Gallery View (Hidden by default) -->
         <div id="tagGalleryView">
             <h2 id="tagGalleryTitle" class="text-lg font-semibold mb-4 text-white col-span-full"></h2>
-            <!-- Filtered thumbnails will be loaded here -->
-        </div>
+            </div>
     </div>
 
-    <!-- Thumbnail Navigation Bar -->
     <div id="thumbnailNav" class="nav-thumbnails flex items-center">
-        <!-- Left content group with fixed width -->
         <div class="navbar-fixed-section flex items-center">
             <div class="app-name">
                 mBed
                 <div id="themeSubmenu" class="submenu-container">
-                    <!-- Dark Mode Toggle Button moved inside submenu -->
                     <button id="themeToggle" class="theme-toggle">
-                        <!-- SVG icons for theme toggle -->
                         <svg class="sun-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -735,9 +734,7 @@
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                     </button>
-                    <!-- Information Button (NEW) -->
                     <button id="infoButton" class="info-button">
-                        <!-- Using a simple, inline SVG for a reliable info icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
                             <text x="12" y="17" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="currentColor">i</text>
@@ -745,30 +742,36 @@
                     </button>
                 </div>
             </div>
-            <!-- First horizontal line connecting "mBed" to "Art" -->
             <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
-            <!-- Gallery Name button -->
-            <button id="galleryNameButton" class="h-[46px] px-3 py-2 rounded-md transition-colors duration-200 text-sm font-semibold">
-                Paintings
-            </button>
-            <!-- Second horizontal line connecting "Art" to media name -->
+            <div id="galleryNameButtonContainer" class="relative">
+                <button id="galleryNameButton" class="h-[46px] px-3 py-2 rounded-md transition-colors duration-200 text-sm font-semibold">
+                    <span>Paintings</span>
+                </button>
+                <div id="gallerySubmenu" class="submenu-container">
+                    <button id="addFileButton" class="add-file-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                        </svg>
+                    </button>
+                    <button id="downloadAllButton" class="add-file-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
             <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
-            <!-- Media name button - now includes the download icon -->
             <button id="mediaNameButton" class="h-[46px] px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200 text-sm font-semibold">
                 <span>No Media Selected</span>
-                <!-- Download SVG icon directly inside the button -->
                 <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
                 </svg>
             </button>
         </div>
 
-        <!-- Thumbnail Wrapper (now explicitly centered relative to the overall navbar) -->
         <div id="thumbnailWrapper" class="thumbnail-wrapper">
-            <!-- Thumbnails will be dynamically loaded here -->
-        </div>
+            </div>
 
-        <!-- Right content group with fixed width -->
         <div class="navbar-fixed-section flex justify-end items-center">
             <div class="search-container flex items-center gap-2">
                 <input type="text" id="searchInput" placeholder="Search by tags or name" class="px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-gray-800">
@@ -781,7 +784,6 @@
         </div>
     </div>
 
-    <!-- The Modal HTML Structure -->
     <div id="infoModalOverlay" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close-button">&times;</button>
@@ -804,24 +806,24 @@
         // as your index.html file, or in a subfolder relative to it.
         // Direct absolute paths like C:\Users\... will NOT work due to browser security.
         const mediaItems = [
-            { src: 'Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg', type: 'image', alt: 'Mona Lisa by Leonardo da Vinci', name: 'Mona Lisa', tags: ['Art', 'Renaissance', 'Painting', 'Leonardo da Vinci'] },
-            { src: 'Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', type: 'image', alt: 'The Starry Night by Vincent van Gogh', name: 'The Starry Night', tags: ['Art', 'Post-Impressionism', 'Painting', 'Landscape', 'Vincent Van Gogh'] },
-            { src: 'Gustav_Klimt_046.jpg', type: 'image', alt: 'Portrait of Adele Bloch-Bauer I by Gustav Klimt', name: 'Adele Bloch-Bauer I', tags: ['Art', 'Symbolism', 'Painting', 'Portrait', 'Gustav Klimt'] },
-            { src: 'The_Last_Supper_-_Leonardo_Da_Vinci_-_High_Resolution_32x16.jpg', type: 'image', alt: 'The Last Supper by Leonardo da Vinci', name: 'The Last Supper', tags: ['Art', 'Renaissance', 'Painting', 'Religious', 'Leonardo da Vinci'] },
-            { src: 'The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg', type: 'image', alt: 'The Kiss by Gustav Klimt', name: 'The Kiss', tags: ['Art', 'Symbolism', 'Painting', 'Gustav Klimt'] },
-            { src: 'Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg', type: 'image', alt: 'The Scream by Edvard Munch', name: 'The Scream', tags: ['Art', 'Expressionism', 'Painting', 'Edvard Munch'] },
-            { src: 'Grant_Wood_-_American_Gothic_-_Google_Art_Project.jpg', type: 'image', alt: 'American Gothic by Grant Wood', name: 'American Gothic', tags: ['Art', 'Regionalism', 'Painting', 'Portrait', 'Grant Wood'] },
-            { src: 'GirlBeforeAMirror.jpg', type: 'image', alt: 'Girl Before a Mirror by Pablo Picasso', name: 'Girl Before a Mirror', tags: ['Art', 'Cubism', 'Painting', 'Portrait', 'Pablo Picasso'] },
-            { src: 'Las_Meninas,_by_Diego_Velázquez,_from_Prado_in_Google_Earth.jpg', type: 'image', alt: 'Las Meninas by Diego Velázquez', name: 'Las Meninas', tags: ['Art', 'Baroque', 'Painting', 'Portrait', 'Diego Velázquez'] },
-            { src: 'Vincent_Van_Gogh_-_Three_Sunflowers_F453.jpg', type: 'image', alt: 'Three Sunflowers by Vincent van Gogh', name: 'Three Sunflowers', tags: ['Art', 'Still Life', 'Painting', 'Vincent Van Gogh'] },
-            { src: 'Frank_Weston_Benson,_The_Dining_Room_Table,_1919.jpg', type: 'image', alt: 'The Dining Room Table by Frank Weston Benson', name: 'The Dining Room Table', tags: ['Art', 'American Impressionism', 'Painting', 'Still Life', 'Frank Weston Benson'] },
+            { src: 'Paintings/Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg', type: 'image', alt: 'Mona Lisa by Leonardo da Vinci', name: 'Mona Lisa', tags: ['Art', 'Renaissance', 'Painting', 'Leonardo da Vinci'] },
+            { src: 'Paintings/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', type: 'image', alt: 'The Starry Night by Vincent van Gogh', name: 'The Starry Night', tags: ['Art', 'Post-Impressionism', 'Painting', 'Landscape', 'Vincent Van Gogh'] },
+            { src: 'Paintings/Gustav_Klimt_046.jpg', type: 'image', alt: 'Portrait of Adele Bloch-Bauer I by Gustav Klimt', name: 'Adele Bloch-Bauer I', tags: ['Art', 'Symbolism', 'Painting', 'Portrait', 'Gustav Klimt'] },
+            { src: 'Paintings/The_Last_Supper_-_Leonardo_Da_Vinci_-_High_Resolution_32x16.jpg', type: 'image', alt: 'The Last Supper by Leonardo da Vinci', name: 'The Last Supper', tags: ['Art', 'Renaissance', 'Painting', 'Religious', 'Leonardo da Vinci'] },
+            { src: 'Paintings/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg', type: 'image', alt: 'The Kiss by Gustav Klimt', name: 'The Kiss', tags: ['Art', 'Symbolism', 'Painting', 'Gustav Klimt'] },
+            { src: 'Paintings/Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg', type: 'image', alt: 'The Scream by Edvard Munch', name: 'The Scream', tags: ['Art', 'Expressionism', 'Painting', 'Edvard Munch'] },
+            { src: 'Paintings/Grant_Wood_-_American_Gothic_-_Google_Art_Project.jpg', type: 'image', alt: 'American Gothic by Grant Wood', name: 'American Gothic', tags: ['Art', 'Regionalism', 'Painting', 'Portrait', 'Grant Wood'] },
+            { src: 'Paintings/GirlBeforeAMirror.jpg', type: 'image', alt: 'Girl Before a Mirror by Pablo Picasso', name: 'Girl Before a Mirror', tags: ['Art', 'Cubism', 'Painting', 'Portrait', 'Pablo Picasso'] },
+            { src: 'Paintings/Las_Meninas,_by_Diego_Velázquez,_from_Prado_in_Google_Earth.jpg', type: 'image', alt: 'Las Meninas by Diego Velázquez', name: 'Las Meninas', tags: ['Art', 'Baroque', 'Painting', 'Portrait', 'Diego Velázquez'] },
+            { src: 'Paintings/Vincent_Van_Gogh_-_Three_Sunflowers_F453.jpg', type: 'image', alt: 'Three Sunflowers by Vincent van Gogh', name: 'Three Sunflowers', tags: ['Art', 'Still Life', 'Painting', 'Vincent Van Gogh'] },
+            { src: 'Paintings/Frank_Weston_Benson,_The_Dining_Room_Table,_1919.jpg', type: 'image', alt: 'The Dining Room Table by Frank Weston Benson', name: 'The Dining Room Table', tags: ['Art', 'American Impressionism', 'Painting', 'Still Life', 'Frank Weston Benson'] },
             // New images added here
-            { src: 'Lady_with_an_Ermine_-_Leonardo_da_Vinci_(adjusted_levels).jpg', type: 'image', alt: 'Lady with an Ermine by Leonardo da Vinci', name: 'Lady with an Ermine', tags: ['Art', 'Renaissance', 'Painting', 'Leonardo da Vinci', 'Portrait'] },
-            { src: '1665_Girl_with_a_Pearl_Earring.jpg', type: 'image', alt: 'Girl with a Pearl Earring by Johannes Vermeer', name: 'Girl with a Pearl Earring', tags: ['Art', 'Baroque', 'Painting', 'Portrait', 'Johannes Vermeer'] },
-            { src: 'The_Night_Watch_-_HD.jpg', type: 'image', alt: 'The Night Watch by Rembrandt van Rijn', name: 'The Night Watch', tags: ['Art', 'Baroque', 'Painting', 'Rembrandt', 'Group Portrait'] },
-            { src: 'Pieter_Bruegel_the_Elder_-_Landscape_with_the_Fall_of_Icarus_-_Brussels,_Royal_Museums_of_Fine_Arts_of_Belgium_-_Google_Arts_&_Culture.jpg', type: 'image', alt: 'Landscape with the Fall of Icarus by Pieter Bruegel the Elder', name: 'Landscape with an Icarus', tags: ['Art', 'Renaissance', 'Painting', 'Landscape', 'Mythology', 'Pieter Bruegel the Elder'] },
-            { src: 'The_School_of_Athens__by_Raffaello_Sanzio_da_Urbino.jpg', type: 'image', alt: 'The School of Athens by Raphael', name: 'The School of Athens', tags: ['Art', 'Renaissance', 'Painting', 'Fresco', 'Raphael', 'Philosophy'] },
-            { src: 'The_Madonna_of_Port_Lligat.jpg', type: 'image', alt: 'The Madonna of Port Lligat by Salvador Dalí', name: 'The Madonna of Port Lligat', tags: ['Art', 'Surrealism', 'Painting', 'Salvador Dalí', 'Religious'] }
+            { src: 'Paintings/Lady_with_an_Ermine_-_Leonardo_da_Vinci_(adjusted_levels).jpg', type: 'image', alt: 'Lady with an Ermine by Leonardo da Vinci', name: 'Lady with an Ermine', tags: ['Art', 'Renaissance', 'Painting', 'Leonardo da Vinci', 'Portrait'] },
+            { src: 'Paintings/1665_Girl_with_a_Pearl_Earring.jpg', type: 'image', alt: 'Girl with a Pearl Earring by Johannes Vermeer', name: 'Girl with a Pearl Earring', tags: ['Art', 'Baroque', 'Painting', 'Portrait', 'Johannes Vermeer'] },
+            { src: 'Paintings/The_Night_Watch_-_HD.jpg', type: 'image', alt: 'The Night Watch by Rembrandt van Rijn', name: 'The Night Watch', tags: ['Art', 'Baroque', 'Painting', 'Rembrandt', 'Group Portrait'] },
+            { src: 'Paintings/Pieter_Bruegel_the_Elder_-_Landscape_with_the_Fall_of_Icarus_-_Brussels,_Royal_Museums_of_Fine_Arts_of_Belgium_-_Google_Arts_&_Culture.jpg', type: 'image', alt: 'Landscape with the Fall of Icarus by Pieter Bruegel the Elder', name: 'Landscape with an Icarus', tags: ['Art', 'Renaissance', 'Painting', 'Landscape', 'Mythology', 'Pieter Bruegel the Elder'] },
+            { src: 'Paintings/The_School_of_Athens__by_Raffaello_Sanzio_da_Urbino.jpg', type: 'image', alt: 'The School of Athens by Raphael', name: 'The School of Athens', tags: ['Art', 'Renaissance', 'Painting', 'Fresco', 'Raphael', 'Philosophy'] },
+            { src: 'Paintings/The_Madonna_of_Port_Lligat.jpg', type: 'image', alt: 'The Madonna of Port Lligat by Salvador Dalí', name: 'The Madonna of Port Lligat', tags: ['Art', 'Surrealism', 'Painting', 'Salvador Dalí', 'Religious'] }
         ];
 
         let currentMediaIndex = 0;
@@ -842,15 +844,17 @@
         const searchButton = document.getElementById('searchButton');
         const mediaNameButton = document.getElementById('mediaNameButton');
         const galleryNameButton = document.getElementById('galleryNameButton');
+        const gallerySubmenu = document.getElementById('gallerySubmenu');
         const tagsDisplay = document.getElementById('tagsDisplay');
         const tagGalleryView = document.getElementById('tagGalleryView');
         const tagGalleryTitle = document.getElementById('tagGalleryTitle');
-        const infoButton = document.getElementById('infoButton'); // NEW: Get info button
-        const infoModalOverlay = document.getElementById('infoModalOverlay'); // NEW: Get modal overlay
-        const modalCloseButton = infoModalOverlay.querySelector('.modal-close-button'); // NEW: Get modal close button
-        
-        // No longer need a separate downloadIconSvg variable if the whole button triggers it.
-        // let downloadIconSvg; 
+        const infoButton = document.getElementById('infoButton'); // Get info button
+        const infoModalOverlay = document.getElementById('infoModalOverlay'); // Get modal overlay
+        const modalCloseButton = infoModalOverlay.querySelector('.modal-close-button'); // Get modal close button
+        const addFileButton = document.getElementById('addFileButton'); // NEW: Get add file button
+        const galleryNameButtonContainer = document.getElementById('galleryNameButtonContainer'); // NEW: Get gallery name button container
+        const downloadAllButton = document.getElementById('downloadAllButton');
+
 
         // Function to calculate how many thumbnails can fit in the wrapper
         function calculateMaxThumbnails() {
@@ -862,10 +866,10 @@
 
             // Estimate the maximum number of thumbnails that can fit
             let maxCount = Math.floor((wrapperWidth + (thumbnailGap / 2)) / effectiveThumbnailWidth);
-            
+
             // Subtract 2 from the maxCount to allow more space
             maxCount = Math.max(1, maxCount - 2); // Ensure it's at least 1, and never negative
-            
+
             // Ensure not more than total items
             return Math.min(mediaItems.length, maxCount);
         }
@@ -944,7 +948,7 @@
 
             // Call createThumbnails here to ensure the active thumbnail is rendered correctly
             // This implicitly calls updateThumbnailHighlight inside
-            createThumbnails(); 
+            createThumbnails();
             // Update mediaNameButton to include the current item's name and the download icon
             mediaNameButton.innerHTML = `
                 <span>${item.name || 'Untitled Media'}</span>
@@ -952,8 +956,6 @@
                     <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
                 </svg>
             `;
-            // Removed direct downloadIconSvg assignment and its click listener.
-            // The download logic will now be handled by the mediaNameButton's general click listener.
 
             displayTags(item.tags); // Display tags for the current item
         }
@@ -1210,22 +1212,60 @@
         // --- End Image Preloading Function ---
 
         // NEW: Download logic for the entire mediaNameButton
-        mediaNameButton.addEventListener('click', (e) => {
-            // Check if the click originated specifically from the SVG icon inside the button.
-            // If it did, we still want to proceed with download.
-            // If the user clicks the text, it will also trigger.
-            console.log(`[Download] Clicked mediaNameButton or its child. Event target:`, e.target);
-            const currentItem = mediaItems[currentMediaIndex];
-            if (currentItem) {
-                console.log(`[Download] Initiating download for: ${currentItem.src}`);
-                const link = document.createElement('a');
-                link.href = currentItem.src;
-                const filename = currentItem.src.substring(currentItem.src.lastIndexOf('/') + 1);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
+        // mediaNameButton.addEventListener('click', (e) => {
+        //     // Check if the click originated specifically from the SVG icon inside the button.
+        //     // If it did, we still want to proceed with download.
+        //     // If the user clicks the text, it will also trigger.
+        //     console.log(`[Download] Clicked mediaNameButton or its child. Event target:`, e.target);
+        //     const currentItem = mediaItems[currentMediaIndex];
+        //     if (currentItem) {
+        //         console.log(`[Download] Initiating download for: ${currentItem.src}`);
+        //         const link = document.createElement('a');
+        //         link.href = currentItem.src;
+        //         const filename = currentItem.src.substring(currentItem.src.lastIndexOf('/') + 1);
+        //         link.download = filename;
+        //         document.body.appendChild(link);
+        //         link.click();
+        //         document.body.removeChild(link);
+        //     }
+        // });
+
+        // Event listener for the new Add File Button
+        addFileButton.addEventListener('click', () => {
+            // In a real application, you would implement file upload logic here.
+            // This might involve:
+            // 1. Opening a file input dialog (e.g., <input type="file"> click())
+            // 2. Handling file selection (FileReader API to read local files)
+            // 3. Uploading to a server (e.g., using Fetch API or XMLHttpRequest)
+            // 4. Updating `mediaItems` array and re-rendering thumbnails/display.
+            // For now, we'll just log a message.
+            alert('Upload file coming soon!');
+            gallerySubmenu.classList.remove('show'); // Hide submenu after clicking
+        });
+
+        // NEW: Download logic for the new Download All button
+        downloadAllButton.addEventListener('click', () => {
+            // Confirm with the user before starting multiple downloads
+            // if (!confirm('Are you sure you want to download all files? This may trigger multiple download prompts.')) {
+            //     gallerySubmenu.classList.remove('show'); // Hide submenu if user cancels
+            //     return;
+            // }
+
+            // console.log('[Download All] Initiating bulk download.');
+
+            // mediaItems.forEach(item => {
+            //     const link = document.createElement('a');
+            //     link.href = item.src;
+            //     // Get the filename from the source URL
+            //     const filename = item.src.substring(item.src.lastIndexOf('/') + 1);
+            //     link.download = filename;
+            //     document.body.appendChild(link);
+            //     link.click();
+            //     document.body.removeChild(link);
+            // });
+
+            gallerySubmenu.classList.remove('show'); // Hide submenu after clicking
+            alert('Bulk download is a Premium feature only!');
         });
 
 
@@ -1316,7 +1356,7 @@
 
         themeToggle.addEventListener('click', toggleTheme);
 
-        // NEW: Event listeners for Information Modal
+        // Event listeners for Information Modal
         infoButton.addEventListener('click', () => {
             infoModalOverlay.classList.add('show');
             themeSubmenu.classList.remove('show'); // Hide submenu when modal opens
@@ -1382,6 +1422,15 @@
             themeSubmenu.classList.remove('show');
         });
 
+        // Add event listeners for the new gallery submenu
+        galleryNameButtonContainer.addEventListener('mouseenter', () => {
+            gallerySubmenu.classList.add('show');
+        });
+
+        galleryNameButtonContainer.addEventListener('mouseleave', () => {
+            gallerySubmenu.classList.remove('show');
+        });
+
         // Add event listener for window resize to re-create thumbnails
         let resizeTimeout;
         window.addEventListener('resize', () => {
@@ -1394,11 +1443,10 @@
         window.onload = function() {
             applySavedTheme();
             // Call displayMedia first, which will then call createThumbnails
-            displayMedia(0); 
+            displayMedia(0);
             // Call preloadImages after initial display
             preloadImages(mediaItems.map(item => item.src));
         };
     </script>
 </body>
 </html>
-
