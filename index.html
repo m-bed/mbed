@@ -10,8 +10,8 @@
     <style>
         /* Define CSS variables for consistent heights */
         :root {
-            --nav-height-desktop: 5rem; /* Reverted: Base height for thumbnails + padding */
-            --nav-height-mobile: 4.5rem; /* Reverted: Adjusted for mobile padding */
+            --nav-height-desktop: 5rem; /* Base height for thumbnails + padding */
+            --nav-height-mobile: 4.5rem; /* Adjusted for mobile padding */
         }
 
         html, body {
@@ -30,13 +30,14 @@
             /* Default body background for light theme, matched to nav-thumbnails */
             background-color: #e5e7eb;
             color: #1f2937; /* Dark gray text */
+            padding-bottom: var(--nav-height-desktop); /* Add padding for fixed nav at the bottom */
         }
         /* Light Theme Defaults (overrides for specific elements) */
         .nav-thumbnails {
             background-color: #e5e7eb; /* Solid light gray */
             box-shadow: none !important; /* No shadow, with !important for strict override */
             min-height: var(--nav-height-desktop); /* Ensure minimum height */
-            height: auto; /* Allow auto height based on content wrapping */
+            height: var(--nav-height-desktop); /* Fixed height for desktop */
             border-top-left-radius: 0 !important; /* Removed rounded edges, with !important */
             border-top-right-radius: 0 !important; /* Removed rounded edges, with !important */
         }
@@ -66,12 +67,12 @@
             transition: background-color 0.2s ease;
             cursor: pointer;
             border: none;
-            display: flex;
+            display: flex; /* Use flex to center icon */
             align-items: center;
-            justify-content: flex-start; /* Align text/icon to start */
+            justify-content: center; /* Center icon horizontally */
             width: 100%; /* Take full width of submenu */
             font-weight: 500; /* Medium font weight */
-            text-align: left; /* Align text to left */
+            text-align: center; /* Center text if any, but now only icon */
         }
         .theme-toggle:hover, .info-button:hover {
             background-color: #d1d5db;
@@ -80,7 +81,7 @@
             fill: currentColor; /* Use current text color for SVG fill */
             width: 1.5rem; /* Icon size */
             height: 1.5rem; /* Icon size */
-            margin-right: 0.5rem; /* Space between icon and text */
+            /* Removed margin-right as there's no text */
             flex-shrink: 0; /* Prevent icon from shrinking */
         }
 
@@ -141,22 +142,23 @@
         }
 
         .gallery-container {
-            flex-grow: 0; /* No longer growing implicitly, height is explicit */
-            flex-shrink: 0; /* Prevents shrinking */
+            flex-grow: 1; /* Allow it to grow and fill available space */
+            flex-shrink: 1; /* Allow it to shrink */
             display: flex;
-            flex-direction: column; /* To center media vertically within it */
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 0; /* Removed padding to allow media to reach edges */
+            padding: 0;
             position: relative;
             background-color: #FFFFFF; /* Reverted to original background color */
             box-shadow: none !important; /* NO shadow in light mode, with !important for strict override */
             border-radius: 0; /* No rounded corners for the gallery container */
-            width: 100%; /* Takes full width of parent (body) */
-            height: calc(100vh - var(--nav-height-desktop)); /* Explicit height calculation */
-            overflow: hidden; /* Hide overflow for media that's larger than the container */
-            margin-bottom: 0; /* No margin at the bottom, handled by thumbnail nav positioning */
-            box-sizing: border-box; /* Include padding in element's total width/height */
+            width: 100%;
+            height: auto; /* Let flexbox determine height based on flex-grow */
+            min-height: calc(100vh - var(--nav-height-desktop)); /* Ensure minimum height */
+            overflow: hidden;
+            margin-bottom: 0;
+            box-sizing: border-box;
         }
         body.dark .gallery-container {
             background-color: #000000; /* Reverted to original background color */
@@ -191,24 +193,40 @@
         }
 
         .nav-thumbnails {
+            position: fixed; /* Fix to the viewport */
+            bottom: 0; /* Align to the bottom */
+            left: 0;
+            right: 0;
             padding: 0.75rem 1rem;
             display: flex;
-            /* Changed to flex-start initially to let spacers control distribution */
             justify-content: flex-start;
-            align-items: center; /* Aligns items vertically in the center */
-            flex-wrap: wrap; /* Allow thumbnails to wrap on smaller screens */
-            width: 100%; /* Take full width */
+            align-items: center;
+            flex-wrap: nowrap; /* Ensure items don't wrap in the nav */
+            width: 100%;
             box-sizing: border-box;
-            flex-shrink: 0; /* Prevent the nav from shrinking */
+            flex-shrink: 0;
+            z-index: 50; /* Ensure it's above general content, but below modals */
+            height: var(--nav-height-desktop); /* Give it a fixed height */
         }
+
+        /* Ensure left and right sections don't grow */
+        .navbar-fixed-section {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            /* Add gap for internal elements if needed, or let them space themselves */
+        }
+
         .thumbnail-wrapper {
             display: flex; /* Makes the wrapper a flex container */
             justify-content: center; /* Centers thumbnails horizontally within this wrapper */
-            flex-grow: 0; /* Do not grow, its position is controlled by spacers */
-            flex-shrink: 0; /* Do not shrink */
+            flex-grow: 1; /* Allow it to grow and fill available space */
+            flex-shrink: 1; /* Allow it to shrink */
             gap: 0.75rem; /* Space between thumbnails */
-            flex-wrap: wrap; /* Allow thumbnails to wrap */
+            flex-wrap: nowrap; /* Prevent thumbnails from wrapping */
             padding: 0 1rem; /* Add some horizontal padding to wrapper */
+            overflow-x: hidden; /* Hide overflow content horizontally */
+            align-items: center; /* Center vertically inside wrapper */
         }
         .thumbnail-item {
             width: 5rem; /* Reverted: Fixed thumbnail width */
@@ -315,7 +333,7 @@
             justify-content: center;
         }
 
-        /* Styling for the new media name button */
+        /* Styling for the media name button (now includes download icon) */
         #mediaNameButton {
             background-color: #8b5cf6; /* A shade of purple */
             color: white;
@@ -324,11 +342,15 @@
             font-weight: 600; /* font-semibold */
             border-radius: 0.5rem;
             transition: background-color 0.2s ease;
-            white-space: nowrap; /* Prevent text wrapping */
-            overflow: hidden; /* Hide overflow text */
-            text-overflow: ellipsis; /* Add ellipsis for overflow */
+            white-space: nowrap; /* Prevent text wrapping - applies to button, but inner span will handle it better */
+            overflow: hidden; /* Hide overflow text - applies to button, but inner span will handle it better */
+            text-overflow: ellipsis; /* Add ellipsis for overflow - applies to button, but inner span will handle it better */
             /* Fixed width to prevent layout shifts */
             width: 150px; /* Adjust this width as needed for your longest painting names */
+            display: flex; /* Use flex to align text and icon */
+            align-items: center; /* Center items vertically */
+            /* Removed justify-content: space-between; to keep icon next to text */
+            gap: 0.5rem; /* Added gap to create spacing between text and icon */
         }
         #mediaNameButton:hover {
             background-color: #7c3aed; /* Darker purple on hover */
@@ -340,13 +362,31 @@
             background-color: #8b5cf6; /* Darker on hover in dark mode */
         }
 
+        /* Style for the text span inside mediaNameButton */
+        #mediaNameButton span {
+            flex-grow: 1; /* Allow text to take up available space */
+            overflow: hidden; /* Hide overflowing text */
+            white-space: nowrap; /* Keep text on a single line */
+            text-overflow: ellipsis; /* Display ellipsis for overflowed text */
+        }
+
+        /* Style for the download SVG inside the mediaNameButton */
+        #mediaNameButton .download-icon {
+            fill: currentColor; /* Inherit color from parent button */
+            width: 1.25rem; /* Smaller icon size */
+            height: 1.25rem; /* Smaller icon size */
+            flex-shrink: 0; /* Prevent icon from shrinking */
+            /* No margin-left needed here if using gap on parent */
+        }
+
+
         /* Styling for the new horizontal connector line */
         .horizontal-connector-line {
             width: 1.5rem; /* Adjusted width for the horizontal line */
             height: 2px; /* Thin line */
             background-color: #6b7280; /* Gray color for the line */
-            /* Adjust margins to make it appear to 'touch' the rounded buttons */
-            margin: 0 0.25rem; /* Small horizontal margin for visual spacing */
+            /* Removed horizontal margins */
+            margin: 0;
         }
 
         /* Styling for the new gallery name button */
@@ -392,7 +432,7 @@
             background-color: #cfd8dc; /* mBed logo background color for light mode */
             color: #4b5563; /* mBed logo text color for light mode */
             padding: 0.25rem 0.75rem; /* Vertical and horizontal padding */
-            border-radius: 9999px; /* Full rounded corners (pill shape) */
+            border-radius: 0.5rem; /* Slightly rounded corners for a square look */
             font-size: 0.75rem; /* Smaller font size */
             white-space: nowrap; /* Prevent tag text from wrapping */
             backdrop-filter: blur(4px); /* Subtle blur effect */
@@ -411,6 +451,18 @@
         body.dark .tag-pill:hover {
             background-color: #607d8b; /* Darker on hover for dark mode */
         }
+        /* Style for the 'Tags' label */
+        .tags-label {
+            font-size: 1rem; /* Smaller font size for header */
+            font-weight: 700; /* Bolder for header appearance */
+            color: #1f2937; /* Dark text for light mode */
+            margin-bottom: 0.25rem; /* Adjusted space below label */
+            transition: color 0.3s ease; /* Smooth transition for color */
+        }
+        body.dark .tags-label {
+            color: #e5e7eb; /* Light text for dark mode */
+        }
+
 
         /* Styles for the new tag gallery view (Responsive Grid) */
         #tagGalleryView {
@@ -439,9 +491,9 @@
 
         /* Styling for thumbnails within the tag gallery */
         .tag-gallery-thumbnail {
-            width: 100%; /* Take full width of its grid cell */
-            height: auto; /* Allow natural height to maintain aspect ratio */
-            object-fit: contain; /* Ensure entire image is visible without cropping */
+            width: 100%;
+            height: auto;
+            object-fit: contain;
             border-radius: 0.75rem;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -461,37 +513,43 @@
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
+            body {
+                padding-bottom: var(--nav-height-mobile); /* Adjust for mobile nav height */
+            }
+            .nav-thumbnails {
+                height: var(--nav-height-mobile); /* Adjust for mobile nav height */
+            }
             :root {
-                --nav-height-desktop: 4.5rem; /* Reverted: Update variable for mobile */
+                --nav-height-desktop: 4.5rem; /* Update variable for mobile */
             }
             .gallery-container {
-                width: 100%; /* Take full width of parent (body) */
-                height: calc(100vh - var(--nav-height-desktop)); /* Will use the mobile nav height */
-                padding: 0; /* Removed padding for mobile */
+                width: 100%;
+                height: auto; /* Let flexbox manage, with min-height */
+                min-height: calc(100vh - var(--nav-height-mobile)); /* Adjusted for mobile nav height */
+                padding: 0;
             }
             /* Media styling for smaller screens */
             #galleryContainer img, #galleryContainer video {
-                 max-width: 100%; /* Adjust based on new padding */
-                 max-height: 100%; /* Adjust based on new padding */
+                 max-width: 100%;
+                 max-height: 100%;
             }
             .thumbnail-item {
-                width: 4rem; /* Reverted */
-                height: 2.8rem; /* Reverted (maintaining aspect ratio 7:5) */
-                margin-bottom: 0.5rem; /* Add some vertical spacing */
+                width: 4rem;
+                height: 2.8rem;
+                margin-bottom: 0.5rem;
             }
             .nav-thumbnails {
                 padding: 0.5rem;
                 gap: 0.5rem;
-                min-height: var(--nav-height-desktop); /* Ensure min-height on mobile */
-                border-top-left-radius: 0 !important; /* Removed rounded edges for mobile, with !important */
-                border-top-right-radius: 0 !important; /* Removed rounded edges for mobile, with !important */
+                border-top-left-radius: 0 !important;
+                border-top-right-radius: 0 !important;
             }
             .app-name {
-                padding-left: 0.5rem; /* Smaller padding on mobile */
+                padding-left: 0.5rem;
                 font-size: 1rem;
             }
             .thumbnail-wrapper {
-                padding: 0 0.5rem; /* Adjust padding for mobile */
+                padding: 0 0.5rem;
             }
             .arrow-button {
                 padding: 0.3rem 0.8rem;
@@ -501,47 +559,47 @@
                 opacity: 1;
             }
             .submenu-container .theme-toggle {
-                padding: 0.4rem; /* Smaller padding for mobile */
+                padding: 0.4rem;
             }
             /* Search container adjustments for mobile */
             .search-container {
-                width: 100%; /* Take full width */
-                justify-content: center; /* Center items */
-                margin-top: 0.5rem; /* Add some top margin */
-                order: 4; /* Push it to the next line on small screens */
+                width: 100%;
+                justify-content: center;
+                margin-top: 0.5rem;
+                order: 4;
             }
             .search-container input {
-                flex-grow: 1; /* Allow input to grow */
-                max-width: 80%; /* Limit max width */
+                flex-grow: 1;
+                max-width: 80%;
             }
             #mediaNameButton {
-                width: 100px; /* Even smaller fixed width on mobile */
-                font-size: 0.75rem; /* Smaller font on mobile */
+                width: 100px;
+                font-size: 0.75rem;
                 padding: 0 0.5rem;
             }
             #galleryNameButton {
-                max-width: 80px; /* Adjust for even smaller mobile screen */
+                max-width: 80px;
                 font-size: 0.75rem;
                 padding: 0 0.5rem;
             }
             .navbar-left-section {
-                width: 100%; /* Take full width on mobile */
-                justify-content: center; /* Center items */
-                margin-bottom: 0.5rem; /* Space before thumbnails */
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 0.5rem;
             }
             #tagsDisplay {
-                left: 0.5rem; /* Reduce left margin on mobile */
-                gap: 0.25rem; /* Reduce gap between tags on mobile */
+                left: 0.5rem;
+                gap: 0.25rem;
             }
             .tag-pill {
-                padding: 0.2rem 0.6rem; /* Smaller padding on mobile */
-                font-size: 0.65rem; /* Even smaller font size on mobile */
+                padding: 0.2rem 0.6rem;
+                font-size: 0.65rem;
             }
         }
         @media (max-width: 480px) {
             .thumbnail-item {
-                width: 3.5rem; /* Reverted */
-                height: 2.5rem; /* Reverted */
+                width: 3.5rem;
+                height: 2.5rem;
             }
             .nav-thumbnails {
                 border-top-left-radius: 0 !important;
@@ -549,8 +607,8 @@
             }
             /* Theme toggle is now within submenu, so these are not strictly needed but kept for completeness */
             .theme-toggle {
-                top: auto; /* Remove absolute positioning */
-                right: auto; /* Remove absolute positioning */
+                top: auto;
+                right: auto;
                 width: auto;
                 height: auto;
                 border-radius: 0.5rem;
@@ -603,6 +661,11 @@
             background-color: #2d3748; /* Darker background in dark mode */
             color: #e5e7eb; /* Lighter text in dark mode */
         }
+        /* Enforce black text for modal paragraphs in light mode,
+           allowing dark mode to use its inherited or explicitly set color */
+        body:not(.dark) .modal-content p {
+            color: black !important;
+        }
 
 
         .modal-close-button {
@@ -632,6 +695,7 @@
 
         <!-- Container for tags, absolutely positioned on the left -->
         <div id="tagsDisplay">
+            <!-- 'Tags' label will be inserted here by JavaScript -->
             <!-- Tags will be dynamically loaded here -->
         </div>
 
@@ -648,62 +712,64 @@
 
     <!-- Thumbnail Navigation Bar -->
     <div id="thumbnailNav" class="nav-thumbnails flex items-center">
-        <!-- Left content group with flexible spacer -->
-        <div class="flex-grow flex justify-start items-center">
-            <div class="navbar-button-group-left flex items-center">
-                <div class="app-name">
-                    mBed
-                    <div id="themeSubmenu" class="submenu-container">
-                        <!-- Dark Mode Toggle Button moved inside submenu -->
-                        <button id="themeToggle" class="theme-toggle">
-                            <!-- SVG icons for theme toggle -->
-                            <svg class="sun-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="5"></circle>
-                                <line x1="12" y1="1" x2="12" y2="3"></line>
-                                <line x1="12" y1="21" x2="12" y2="23"></line>
-                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                                <line x1="1" y1="12" x2="3" y2="12"></line>
-                                <line x1="21" y1="12" x2="23" y2="12"></line>
-                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                            </svg>
-                            <svg class="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                            </svg>
-                            <span>Theme</span>
-                        </button>
-                        <!-- Information Button (NEW) -->
-                        <button id="infoButton" class="info-button">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437-.443 3.347.402a.75.75 0 0 0 1.06-1.06c-1.35-1.351-3.473-1.581-4.88-.679l-.04-.02V7.5a.75.75 0 0 0-1.5 0v2.25c0 .207.118.398.307.494Zm-.442 4.025a.75.75 0 0 0 .825.148 5.753 5.753 0 0 0 1.455-.293.75.75 0 0 0-.236-1.468 4.253 4.253 0 0 1-1.087.213.75.75 0 0 0-.584.897Z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Information</span>
-                        </button>
-                    </div>
+        <!-- Left content group with fixed width -->
+        <div class="navbar-fixed-section flex items-center">
+            <div class="app-name">
+                mBed
+                <div id="themeSubmenu" class="submenu-container">
+                    <!-- Dark Mode Toggle Button moved inside submenu -->
+                    <button id="themeToggle" class="theme-toggle">
+                        <!-- SVG icons for theme toggle -->
+                        <svg class="sun-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg class="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    <!-- Information Button (NEW) -->
+                    <button id="infoButton" class="info-button">
+                        <!-- Using a simple, inline SVG for a reliable info icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <text x="12" y="17" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="currentColor">i</text>
+                        </svg>
+                    </button>
                 </div>
-                <!-- First horizontal line connecting "mBed" to "Art" -->
-                <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
-                <!-- Gallery Name button -->
-                <button id="galleryNameButton" class="h-[46px] px-3 py-2 rounded-md transition-colors duration-200 text-sm font-semibold">
-                    Paintings
-                </button>
-                <!-- Second horizontal line connecting "Art" to media name -->
-                <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
-                <!-- Media name button -->
-                <button id="mediaNameButton" class="h-[46px] px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200 text-sm font-semibold">
-                    No Media Selected
-                </button>
             </div>
+            <!-- First horizontal line connecting "mBed" to "Art" -->
+            <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
+            <!-- Gallery Name button -->
+            <button id="galleryNameButton" class="h-[46px] px-3 py-2 rounded-md transition-colors duration-200 text-sm font-semibold">
+                Paintings
+            </button>
+            <!-- Second horizontal line connecting "Art" to media name -->
+            <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
+            <!-- Media name button - now includes the download icon -->
+            <button id="mediaNameButton" class="h-[46px] px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200 text-sm font-semibold">
+                <span>No Media Selected</span>
+                <!-- Download SVG icon directly inside the button -->
+                <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                </svg>
+            </button>
         </div>
 
         <!-- Thumbnail Wrapper (now explicitly centered relative to the overall navbar) -->
-        <div id="thumbnailWrapper" class="thumbnail-wrapper flex justify-center">
+        <div id="thumbnailWrapper" class="thumbnail-wrapper">
             <!-- Thumbnails will be dynamically loaded here -->
         </div>
 
-        <!-- Right content group with flexible spacer -->
-        <div class="flex-grow flex justify-end items-center">
+        <!-- Right content group with fixed width -->
+        <div class="navbar-fixed-section flex justify-end items-center">
             <div class="search-container flex items-center gap-2">
                 <input type="text" id="searchInput" placeholder="Search by tags or name" class="px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-gray-800">
                 <button id="searchButton" class="px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200">
@@ -719,15 +785,15 @@
     <div id="infoModalOverlay" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close-button">&times;</button>
-            <h3 class="text-xl font-bold mb-4">About mBed Gallery</h3>
-            <p class="text-gray-700 dark:text-gray-300">
-                This is a simple media gallery application built with HTML, CSS (Tailwind CSS), and JavaScript.
-                It allows you to browse through a collection of images and videos,
-                toggle between light and dark themes, and search media by tags or name.
+            <h3 class="text-xl font-bold mb-4">mBed v1.0</h3>
+            <p class="text-black dark:text-gray-300">
+                Media Browser Embedded Display<br>
             </p>
-            <p class="text-gray-700 dark:text-gray-300 mt-2">
-                Use the arrow keys or click the left/right sides of the media to navigate.
-                You can also use the thumbnail bar at the bottom.
+            <p class="text-black dark:text-gray-300 mt-2">
+                Use the scroll wheel, arrow keys, or click the left/right sides of the media to navigate.<br>
+                You can also directly click the media tags or the thumbnails on the bottom navbar.<br>
+            </p><p class="text-black dark:text-gray-300 mt-2">
+                Source: <a href="https://github.com/3Daim/mbed/" target="_blank" class="text-blue-500 hover:underline dark:text-blue-300">https://github.com/3Daim/mbed/</a>
             </p>
         </div>
     </div>
@@ -748,7 +814,14 @@
             { src: 'GirlBeforeAMirror.jpg', type: 'image', alt: 'Girl Before a Mirror by Pablo Picasso', name: 'Girl Before a Mirror', tags: ['Art', 'Cubism', 'Painting', 'Portrait', 'Pablo Picasso'] },
             { src: 'Las_Meninas,_by_Diego_Velázquez,_from_Prado_in_Google_Earth.jpg', type: 'image', alt: 'Las Meninas by Diego Velázquez', name: 'Las Meninas', tags: ['Art', 'Baroque', 'Painting', 'Portrait', 'Diego Velázquez'] },
             { src: 'Vincent_Van_Gogh_-_Three_Sunflowers_F453.jpg', type: 'image', alt: 'Three Sunflowers by Vincent van Gogh', name: 'Three Sunflowers', tags: ['Art', 'Still Life', 'Painting', 'Vincent Van Gogh'] },
-            { src: 'Frank_Weston_Benson,_The_Dining_Room_Table,_1919.jpg', type: 'image', alt: 'The Dining Room Table by Frank Weston Benson', name: 'The Dining Room Table', tags: ['Art', 'American Impressionism', 'Painting', 'Still Life', 'Frank Weston Benson'] }
+            { src: 'Frank_Weston_Benson,_The_Dining_Room_Table,_1919.jpg', type: 'image', alt: 'The Dining Room Table by Frank Weston Benson', name: 'The Dining Room Table', tags: ['Art', 'American Impressionism', 'Painting', 'Still Life', 'Frank Weston Benson'] },
+            // New images added here
+            { src: 'Lady_with_an_Ermine_-_Leonardo_da_Vinci_(adjusted_levels).jpg', type: 'image', alt: 'Lady with an Ermine by Leonardo da Vinci', name: 'Lady with an Ermine', tags: ['Art', 'Renaissance', 'Painting', 'Leonardo da Vinci', 'Portrait'] },
+            { src: '1665_Girl_with_a_Pearl_Earring.jpg', type: 'image', alt: 'Girl with a Pearl Earring by Johannes Vermeer', name: 'Girl with a Pearl Earring', tags: ['Art', 'Baroque', 'Painting', 'Portrait', 'Johannes Vermeer'] },
+            { src: 'The_Night_Watch_-_HD.jpg', type: 'image', alt: 'The Night Watch by Rembrandt van Rijn', name: 'The Night Watch', tags: ['Art', 'Baroque', 'Painting', 'Rembrandt', 'Group Portrait'] },
+            { src: 'Pieter_Bruegel_the_Elder_-_Landscape_with_the_Fall_of_Icarus_-_Brussels,_Royal_Museums_of_Fine_Arts_of_Belgium_-_Google_Arts_&_Culture.jpg', type: 'image', alt: 'Landscape with the Fall of Icarus by Pieter Bruegel the Elder', name: 'Landscape with an Icarus', tags: ['Art', 'Renaissance', 'Painting', 'Landscape', 'Mythology', 'Pieter Bruegel the Elder'] },
+            { src: '_The_School_of_Athens__by_Raffaello_Sanzio_da_Urbino.jpg', type: 'image', alt: 'The School of Athens by Raphael', name: 'The School of Athens', tags: ['Art', 'Renaissance', 'Painting', 'Fresco', 'Raphael', 'Philosophy'] },
+            { src: 'The_Madonna_of_Port_Lligat.jpg', type: 'image', alt: 'The Madonna of Port Lligat by Salvador Dalí', name: 'The Madonna of Port Lligat', tags: ['Art', 'Surrealism', 'Painting', 'Salvador Dalí', 'Religious'] }
         ];
 
         let currentMediaIndex = 0;
@@ -775,7 +848,27 @@
         const infoButton = document.getElementById('infoButton'); // NEW: Get info button
         const infoModalOverlay = document.getElementById('infoModalOverlay'); // NEW: Get modal overlay
         const modalCloseButton = infoModalOverlay.querySelector('.modal-close-button'); // NEW: Get modal close button
+        
+        // No longer need a separate downloadIconSvg variable if the whole button triggers it.
+        // let downloadIconSvg; 
 
+        // Function to calculate how many thumbnails can fit in the wrapper
+        function calculateMaxThumbnails() {
+            // Get the actual computed width of the thumbnailWrapper
+            const wrapperWidth = thumbnailWrapper.offsetWidth;
+            const thumbnailWidth = 80; // 5rem = 80px
+            const thumbnailGap = 12; // 0.75rem = 12px
+            const effectiveThumbnailWidth = thumbnailWidth + thumbnailGap;
+
+            // Estimate the maximum number of thumbnails that can fit
+            let maxCount = Math.floor((wrapperWidth + (thumbnailGap / 2)) / effectiveThumbnailWidth);
+            
+            // Subtract 2 from the maxCount to allow more space
+            maxCount = Math.max(1, maxCount - 2); // Ensure it's at least 1, and never negative
+            
+            // Ensure not more than total items
+            return Math.min(mediaItems.length, maxCount);
+        }
 
         // Function to display the selected media (main single image view)
         function displayMedia(index) {
@@ -849,8 +942,19 @@
             }
 
 
-            updateThumbnailHighlight();
-            mediaNameButton.textContent = item.name || 'Untitled Media';
+            // Call createThumbnails here to ensure the active thumbnail is rendered correctly
+            // This implicitly calls updateThumbnailHighlight inside
+            createThumbnails(); 
+            // Update mediaNameButton to include the current item's name and the download icon
+            mediaNameButton.innerHTML = `
+                <span>${item.name || 'Untitled Media'}</span>
+                <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                </svg>
+            `;
+            // Removed direct downloadIconSvg assignment and its click listener.
+            // The download logic will now be handled by the mediaNameButton's general click listener.
+
             displayTags(item.tags); // Display tags for the current item
         }
 
@@ -947,15 +1051,19 @@
         }
 
         function updateThumbnailHighlight() {
-            const thumbnails = document.querySelectorAll('.thumbnail-item');
-            thumbnails.forEach((thumb, i) => {
-                if (i === currentMediaIndex) {
-                    thumb.classList.add('active');
-                    thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                } else {
-                    thumb.classList.remove('active');
-                }
+            // Remove active class from all thumbnails first
+            // Ensure we only query within the thumbnailWrapper to avoid issues if other thumbs exist elsewhere
+            thumbnailWrapper.querySelectorAll('.thumbnail-item').forEach(thumb => {
+                thumb.classList.remove('active');
             });
+
+            // Find the current thumbnail and add active class
+            const currentThumb = thumbnailWrapper.querySelector(`[data-index="${currentMediaIndex}"]`);
+            if (currentThumb) {
+                currentThumb.classList.add('active');
+                // The scrollIntoView is called here, but its effectiveness depends on the parent having overflow:auto/scroll
+                currentThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
         }
 
         function nextMedia() {
@@ -968,43 +1076,80 @@
 
         function createThumbnails() {
             thumbnailWrapper.innerHTML = ''; // Clear existing thumbnails
-            mediaItems.forEach((item, index) => {
-                const thumbnailDiv = document.createElement('div');
-                thumbnailDiv.classList.add('thumbnail-item');
-                thumbnailDiv.dataset.index = index;
 
-                if (item.type === 'image') {
-                    const img = document.createElement('img');
-                    img.src = item.src; // Use relative path
-                    img.alt = `Thumbnail for ${item.alt}`;
-                    img.onerror = (e) => {
-                        console.error(`Error loading thumbnail: ${item.src}.`);
-                        if (!e.target.dataset.placeholderSet) {
-                            e.target.src = `https://placehold.co/80x60/dddddd/333333?text=Thumb+Error`;
-                            e.target.dataset.placeholderSet = 'true';
-                        }
-                    };
-                    thumbnailDiv.appendChild(img);
-                } else if (item.type === 'video') {
-                    const videoIcon = document.createElement('div');
-                    videoIcon.classList.add('video-overlay');
-                    videoIcon.innerHTML = '▶';
-                    thumbnailDiv.appendChild(videoIcon);
-                }
+            const maxVisibleCount = calculateMaxThumbnails();
+            let startIndex;
 
-                thumbnailDiv.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    displayMedia(index);
-                    searchInput.value = ''; // Clear search bar
-                });
+            if (mediaItems.length <= maxVisibleCount) {
+                // If all items fit, show all
+                startIndex = 0;
+            } else {
+                // Calculate startIndex to center the current media
+                const centerOffset = Math.floor(maxVisibleCount / 2);
+
+                // Try to center the currentMediaIndex
+                startIndex = currentMediaIndex - centerOffset;
+
+                // Clamp startIndex to ensure it's within valid bounds
+                startIndex = Math.max(0, startIndex); // Ensure not negative
+                startIndex = Math.min(startIndex, mediaItems.length - maxVisibleCount); // Ensure window doesn't go past the end
+            }
+
+            const endIndex = startIndex + maxVisibleCount;
+
+            const visibleMediaItems = mediaItems.slice(startIndex, endIndex);
+
+            visibleMediaItems.forEach((item, relativeIndex) => {
+                const actualIndex = startIndex + relativeIndex; // This is the index in the original mediaItems array
+                const thumbnailDiv = createSingleThumbnail(item, actualIndex);
                 thumbnailWrapper.appendChild(thumbnailDiv);
             });
+            updateThumbnailHighlight(); // Ensure highlight is correct after re-creation
+        }
+
+        // Helper function for creating a single thumbnail
+        function createSingleThumbnail(item, actualIndex) {
+            const thumbnailDiv = document.createElement('div');
+            thumbnailDiv.classList.add('thumbnail-item');
+            thumbnailDiv.dataset.index = actualIndex; // Store actual index
+
+            if (item.type === 'image') {
+                const img = document.createElement('img');
+                img.src = item.src;
+                img.alt = `Thumbnail for ${item.alt}`;
+                img.onerror = (e) => {
+                    console.error(`Error loading thumbnail: ${item.src}.`);
+                    if (!e.target.dataset.placeholderSet) {
+                        e.target.src = `https://placehold.co/80x60/dddddd/333333?text=Thumb+Error`;
+                        e.target.dataset.placeholderSet = 'true';
+                    }
+                };
+                thumbnailDiv.appendChild(img);
+            } else if (item.type === 'video') {
+                const videoIcon = document.createElement('div');
+                videoIcon.classList.add('video-overlay');
+                videoIcon.innerHTML = '▶';
+                thumbnailDiv.appendChild(videoIcon);
+            }
+
+            thumbnailDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                displayMedia(actualIndex); // Use actual index for display
+                searchInput.value = '';
+            });
+            return thumbnailDiv;
         }
 
         // Modified function to display tags as clickable buttons
         function displayTags(tags) {
             tagsDisplay.innerHTML = ''; // Clear previous tags
             tagsDisplay.style.display = 'flex'; // Ensure tags are visible for the main view
+
+            // Create and append the 'Tags' label
+            const tagsLabel = document.createElement('span');
+            tagsLabel.classList.add('tags-label'); // Apply the new styling class
+            tagsLabel.textContent = 'Tags:'; // Changed text to "Tags:"
+            tagsDisplay.appendChild(tagsLabel);
 
             if (tags && tags.length > 0) {
                 tags.forEach(tagText => {
@@ -1064,6 +1209,26 @@
         }
         // --- End Image Preloading Function ---
 
+        // NEW: Download logic for the entire mediaNameButton
+        mediaNameButton.addEventListener('click', (e) => {
+            // Check if the click originated specifically from the SVG icon inside the button.
+            // If it did, we still want to proceed with download.
+            // If the user clicks the text, it will also trigger.
+            console.log(`[Download] Clicked mediaNameButton or its child. Event target:`, e.target);
+            const currentItem = mediaItems[currentMediaIndex];
+            if (currentItem) {
+                console.log(`[Download] Initiating download for: ${currentItem.src}`);
+                const link = document.createElement('a');
+                link.href = currentItem.src;
+                const filename = currentItem.src.substring(currentItem.src.lastIndexOf('/') + 1);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+
+
         // Modified keydown listener for Escape and directing input
         document.addEventListener('keydown', (event) => {
             const isSearchInputFocused = (document.activeElement === searchInput);
@@ -1119,7 +1284,9 @@
         // Event listener for clicks anywhere on the document to unfocus search bar
         document.addEventListener('click', (event) => {
             const target = event.target;
-            if (target !== searchInput && target !== searchButton && !searchContainer.contains(target)) {
+            // Ensure the click target is not the download icon itself when it's part of mediaNameButton
+            // The `mediaNameButton.contains(target)` check handles clicks on the button's children (span, svg)
+            if (target !== searchInput && target !== searchButton && !searchContainer.contains(target) && !mediaNameButton.contains(target)) {
                 searchInput.blur();
             }
         });
@@ -1184,7 +1351,7 @@
                 // Change to target mainMediaDisplayArea for click logic
                 const currentMediaElement = mainMediaDisplayArea.querySelector('img, video');
 
-                if (currentMediaElement) {
+                    if (currentMediaElement) {
                     const mediaRect = currentMediaElement.getBoundingClientRect();
                     const clickX = event.clientX - mediaRect.left;
 
@@ -1215,10 +1382,19 @@
             themeSubmenu.classList.remove('show');
         });
 
+        // Add event listener for window resize to re-create thumbnails
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                createThumbnails(); // Re-create thumbnails on resize
+            }, 100); // Debounce to prevent excessive calls
+        });
+
         window.onload = function() {
             applySavedTheme();
-            createThumbnails();
-            displayMedia(0);
+            // Call displayMedia first, which will then call createThumbnails
+            displayMedia(0); 
             // Call preloadImages after initial display
             preloadImages(mediaItems.map(item => item.src));
         };
