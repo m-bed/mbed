@@ -1212,23 +1212,23 @@
         // --- End Image Preloading Function ---
 
         // NEW: Download logic for the entire mediaNameButton
-        // mediaNameButton.addEventListener('click', (e) => {
-        //     // Check if the click originated specifically from the SVG icon inside the button.
-        //     // If it did, we still want to proceed with download.
-        //     // If the user clicks the text, it will also trigger.
-        //     console.log(`[Download] Clicked mediaNameButton or its child. Event target:`, e.target);
-        //     const currentItem = mediaItems[currentMediaIndex];
-        //     if (currentItem) {
-        //         console.log(`[Download] Initiating download for: ${currentItem.src}`);
-        //         const link = document.createElement('a');
-        //         link.href = currentItem.src;
-        //         const filename = currentItem.src.substring(currentItem.src.lastIndexOf('/') + 1);
-        //         link.download = filename;
-        //         document.body.appendChild(link);
-        //         link.click();
-        //         document.body.removeChild(link);
-        //     }
-        // });
+        mediaNameButton.addEventListener('click', (e) => {
+            // Check if the click originated specifically from the SVG icon inside the button.
+            // If it did, we still want to proceed with download.
+            // If the user clicks the text, it will also trigger.
+            console.log(`[Download] Clicked mediaNameButton or its child. Event target:`, e.target);
+            const currentItem = mediaItems[currentMediaIndex];
+            if (currentItem) {
+                console.log(`[Download] Initiating download for: ${currentItem.src}`);
+                const link = document.createElement('a');
+                link.href = currentItem.src;
+                const filename = currentItem.src.substring(currentItem.src.lastIndexOf('/') + 1);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
 
         // Event listener for the new Add File Button
         addFileButton.addEventListener('click', () => {
@@ -1239,33 +1239,33 @@
             // 3. Uploading to a server (e.g., using Fetch API or XMLHttpRequest)
             // 4. Updating `mediaItems` array and re-rendering thumbnails/display.
             // For now, we'll just log a message.
-            alert('Upload file coming soon!');
+            alert('This is where you would add functionality to upload a new file! (Premium Feature)');
             gallerySubmenu.classList.remove('show'); // Hide submenu after clicking
         });
 
         // NEW: Download logic for the new Download All button
         downloadAllButton.addEventListener('click', () => {
             // Confirm with the user before starting multiple downloads
-            // if (!confirm('Are you sure you want to download all files? This may trigger multiple download prompts.')) {
-            //     gallerySubmenu.classList.remove('show'); // Hide submenu if user cancels
-            //     return;
-            // }
+            if (!confirm('Are you sure you want to download all files? This may trigger multiple download prompts.')) {
+                gallerySubmenu.classList.remove('show'); // Hide submenu if user cancels
+                return;
+            }
 
-            // console.log('[Download All] Initiating bulk download.');
+            console.log('[Download All] Initiating bulk download.');
 
-            // mediaItems.forEach(item => {
-            //     const link = document.createElement('a');
-            //     link.href = item.src;
-            //     // Get the filename from the source URL
-            //     const filename = item.src.substring(item.src.lastIndexOf('/') + 1);
-            //     link.download = filename;
-            //     document.body.appendChild(link);
-            //     link.click();
-            //     document.body.removeChild(link);
-            // });
+            mediaItems.forEach(item => {
+                const link = document.createElement('a');
+                link.href = item.src;
+                // Get the filename from the source URL
+                const filename = item.src.substring(item.src.lastIndexOf('/') + 1);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
 
             gallerySubmenu.classList.remove('show'); // Hide submenu after clicking
-            alert('Bulk download is a Premium feature only!');
+            alert('Download process initiated. Please check your browser for download prompts.');
         });
 
 
