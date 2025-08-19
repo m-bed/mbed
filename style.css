@@ -17,14 +17,14 @@ body {
     flex-direction: column;
     min-height: 100vh; /* Ensures body takes full viewport height */
     overflow-x: hidden; /* Prevent horizontal scrolling */
-    /* Default body background for light theme, matched to nav-thumbnails */
-    background-color: #e5e7eb;
+    /* Updated for light theme: white background, dark gray text */
+    background-color: #FFFFFF;
     color: #1f2937; /* Dark gray text */
     padding-bottom: var(--nav-height-desktop); /* Add padding for fixed nav at the bottom */
 }
 /* Light Theme Defaults (overrides for specific elements) */
 .nav-thumbnails {
-    background-color: #e5e7eb; /* Solid light gray */
+    background-color: #000000; /* Set to BLACK */
     box-shadow: none !important; /* No shadow, with !important for strict override */
     min-height: var(--nav-height-desktop); /* Ensure minimum height */
     height: var(--nav-height-desktop); /* Fixed height for desktop */
@@ -50,7 +50,7 @@ body {
 }
 /* Combined styling for theme toggle and info button within submenu */
 .theme-toggle, .info-button, .add-file-button {
-    background-color: #e5e7eb;
+    background-color: #eeeeee; /* Lighter gray for buttons in light mode */
     color: #1f2937;
     border-radius: 0.5rem; /* Consistent rounded corners */
     padding: 0.5rem 0.75rem; /* Consistent padding for button feel */
@@ -65,7 +65,7 @@ body {
     text-align: center; /* Center text if any, but now only icon */
 }
 .theme-toggle:hover, .info-button:hover, .add-file-button:hover {
-    background-color: #d1d5db;
+    background-color: #cccccc; /* Darker on hover for light mode */
 }
 .theme-toggle svg, .info-button svg, .add-file-button svg {
     fill: currentColor; /* Use current text color for SVG fill */
@@ -79,33 +79,33 @@ body {
     font-weight: 700;
     font-size: 1.25rem;
     color: #4b5563; /* Darker text for app name */
-    padding: 0.5rem 1rem; /* Padding for button look */
-    display: flex;
-    align-items: center;
-    background-color: #cfd8dc; /* Button background color for light mode */
+    background-color: #eeeeee; /* Lighter gray for app name button in light mode */
     border-radius: 0.5rem; /* Rounded edges for button */
     cursor: pointer; /* Indicate clickable */
     transition: background-color 0.2s ease; /* Smooth transition on hover */
     position: relative; /* Needed for positioning the submenu */
     z-index: 30; /* Ensure the app name and its submenu are on top */
+    padding: 0.5rem 1rem; /* Padding for button look */
+    display: flex;
+    align-items: center;
 }
 .app-name:hover {
-    background-color: #b0bec5; /* Darker on hover for light mode */
+    background-color: #cccccc; /* Darker on hover for light mode */
 }
 
 /* Dark Theme Styles */
 body.dark {
-    background-color: #1f2937; /* Dark blue-gray background */
+    background-color: #000000; /* Pure black background for dark mode */
     color: #e5e7eb; /* Light gray text */
 }
 body.dark .nav-thumbnails {
-    background-color: #374151; /* Solid dark gray */
+    background-color: #000000; /* Set to BLACK */
     box-shadow: none !important; /* No shadow, with !important for strict override */
     border-top-left-radius: 0 !important; /* Removed rounded edges, with !important */
     border-top-right-radius: 0 !important; /* Removed rounded edges, with !important */
 }
 body.dark .thumbnail-item {
-    background-color: #4b5563; /* Darker gray for placeholder */
+    background-color: #333333; /* Dark gray for placeholder in dark mode */
 }
 body.dark .thumbnail-item.active {
     border: 3px solid #818cf8; /* Lighter purple border for active */
@@ -140,7 +140,7 @@ body.dark .app-name:hover {
     justify-content: center;
     padding: 0;
     position: relative;
-    background-color: #FFFFFF; /* Reverted to original background color */
+    background-color: #FFFFFF; /* White background for main gallery in light mode */
     box-shadow: none !important; /* NO shadow in light mode, with !important for strict override */
     border-radius: 0; /* No rounded corners for the gallery container */
     width: 100%;
@@ -151,7 +151,7 @@ body.dark .app-name:hover {
     box-sizing: border-box;
 }
 body.dark .gallery-container {
-    background-color: #000000; /* Reverted to original background color */
+    background-color: #000000; /* Black background for main gallery in dark mode */
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); /* Stronger shadow in dark mode */
     border-radius: 0; /* No rounded corners for the gallery container in dark mode */
 }
@@ -189,9 +189,9 @@ body.dark .gallery-container {
     right: 0;
     padding: 0.75rem 1rem;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between; /* Spread out items */
     align-items: center;
-    flex-wrap: nowrap; /* Ensure items don't wrap in the nav */
+    flex-wrap: nowrap; /* Ensure items don't wrap on desktop */
     width: 100%;
     box-sizing: border-box;
     flex-shrink: 0;
@@ -204,7 +204,16 @@ body.dark .gallery-container {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    /* Add gap for internal elements if needed, or let them space themselves */
+}
+
+/* New: Container for thumbnails and search bar on the right */
+.navbar-right-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Space between thumbnails wrapper and search bar */
+    flex-shrink: 0;
+    flex-grow: 1; /* ADDED: Allow this entire group to grow */
+    justify-content: flex-end; /* ADDED: Push content to the right within this growing container */
 }
 
 .thumbnail-wrapper {
@@ -217,10 +226,13 @@ body.dark .gallery-container {
     padding: 0 1rem; /* Add some horizontal padding to wrapper */
     overflow-x: hidden; /* Hide overflow content horizontally */
     align-items: center; /* Center vertically inside wrapper */
+    min-width: 0; /* Allows the flex item to shrink below its content size */
+    /* REMOVED: max-width: 60%; */
 }
 .thumbnail-item {
-    width: 5rem; /* Reverted: Fixed thumbnail width */
-    height: 3.5rem; /* Reverted: Fixed thumbnail height */
+    width: 5rem; /* Fixed thumbnail width */
+    height: 3.5rem; /* Fixed thumbnail height */
+    background-color: #cfd8dc; /* Slightly darker light gray for placeholder */
     border-radius: 0.75rem; /* Rounded thumbnails */
     cursor: pointer;
     overflow: hidden;
@@ -281,7 +293,7 @@ body.dark .gallery-container {
     left: 0;
     display: none; /* Start hidden for instant show/hide */
     flex-direction: column; /* Vertical layout */
-    background-color: #e5e7eb; /* Match light theme nav background */
+    background-color: #FFFFFF; /* Match light theme nav background */
     border-radius: 0.5rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 0.5rem;
@@ -292,7 +304,7 @@ body.dark .gallery-container {
 }
 
 body.dark .submenu-container {
-    background-color: #374151; /* Match dark theme nav background */
+    background-color: #222222; /* Match dark theme nav background */
     box-shadow: 0 44x 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -347,6 +359,7 @@ body.dark .submenu-container {
 }
 body.dark #mediaNameButton {
     background-color: #a78bfa; /* Lighter purple in dark mode */
+    color: white; /* Reverted to white */
 }
 body.dark #mediaNameButton:hover {
     background-color: #8b5cf6; /* Darker on hover in dark mode */
@@ -430,7 +443,7 @@ body.dark #galleryNameButton:hover {
 /* Style for individual tag pills (now buttons) */
 .tag-pill {
     /* Match mBed logo button styles */
-    background-color: #cfd8dc; /* mBed logo background color for light mode */
+    background-color: #f0f0f0; /* Slightly off-white for tags in light mode */
     color: #4b5563; /* mBed logo text color for light mode */
     padding: 0.25rem 0.75rem; /* Vertical and horizontal padding */
     border-radius: 0.5rem; /* Slightly rounded corners for a square look */
@@ -443,14 +456,14 @@ body.dark #galleryNameButton:hover {
     pointer-events: auto; /* Re-enable pointer events for clicks */
 }
 body.dark .tag-pill {
-    background-color: #4b5563; /* mBed logo background color for dark mode */
+    background-color: #222222; /* Darker gray for tags in dark mode */
     color: #cbd5e1; /* mBed logo text color for dark mode */
 }
 .tag-pill:hover {
-    background-color: #b0bec5; /* Darker on hover for light mode */
+    background-color: #cccccc; /* Darker on hover for light mode */
 }
 body.dark .tag-pill:hover {
-    background-color: #607d8b; /* Darker on hover for dark mode */
+    background-color: #444444; /* Darker on hover for dark mode */
 }
 /* Style for the 'Tags' label */
 .tags-label {
@@ -475,7 +488,7 @@ body.dark .tags-label {
     height: 100%;
     padding: 1rem;
     overflow-y: auto; /* Enable scrolling for many thumbnails */
-    background-color: #FFFFFF; /* Changed to white for light theme */
+    background-color: #FFFFFF; /* White for light theme */
     color: #1f2937; /* Dark text for readability on light background */
     box-sizing: border-box; /* Include padding in dimensions */
 
@@ -485,8 +498,11 @@ body.dark .tags-label {
     justify-items: center; /* Center items in their cells */
     align-items: start; /* Align items to the top of their cells */
 }
+body.dark .tag-gallery-thumbnail-container {
+     background-color: #1a1a1a; /* Darker background for image container in dark mode */
+}
 body.dark #tagGalleryView {
-    background-color: #000000; /* Ensured black for dark mode too */
+    background-color: #000000; /* Black for dark mode */
     color: #e5e7eb;
 }
 
@@ -550,7 +566,10 @@ body.dark .tag-gallery-thumbnail:hover {
         font-size: 1rem;
     }
     .thumbnail-wrapper {
-        padding: 0 0.5rem;
+        padding: 0; /* REMOVED: padding: 0 0.5rem; to give more space */
+        justify-content: flex-start; /* Align left if space is tight */
+        overflow-x: auto; /* ADDED: Allow scrolling on mobile if many thumbnails */
+        -webkit-overflow-scrolling: touch; /* ADDED: Smooth scrolling on iOS */
     }
     .arrow-button {
         padding: 0.3rem 0.8rem;
@@ -570,8 +589,8 @@ body.dark .tag-gallery-thumbnail:hover {
         order: 4;
     }
     .search-container input {
-        flex-grow: 1;
-        max-width: 80%;
+        flex-grow: 1; /* Allow input to grow */
+        max-width: none; /* Ensure no max-width restricts it */
     }
     #mediaNameButton {
         width: 100px;
@@ -583,10 +602,13 @@ body.dark .tag-gallery-thumbnail:hover {
         font-size: 0.75rem;
         padding: 0 0.5rem;
     }
-    .navbar-left-section {
-        width: 100%;
-        justify-content: center;
-        margin-bottom: 0.5rem;
+    .navbar-fixed-section { /* Apply to both left and right fixed sections */
+         width: auto;
+         justify-content: flex-start; /* Default for left section */
+         margin-bottom: 0;
+    }
+    .navbar-fixed-section:last-child { /* Specifically target the right section */
+        margin-left: auto; /* Push to the right */
     }
     #tagsDisplay {
         left: 0.5rem;
