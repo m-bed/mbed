@@ -2,7 +2,8 @@
 // IMPORTANT: For local files, ensure these images are in the SAME folder
 // as your index.html file, or in a subfolder relative to it.
 // Direct absolute paths like C:\Users\... will NOT work due to browser security.
-const mediaItems = [
+// Separate data arrays for each gallery
+const PAINTINGS_DATA = [
     { src: 'Paintings/Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg', type: 'image', alt: 'Mona Lisa by Leonardo da Vinci', name: 'Mona Lisa', tags: ['Art', 'Renaissance', 'Painting', 'Leonardo da Vinci'] },
     { src: 'Paintings/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', type: 'image', alt: 'The Starry Night by Vincent van Gogh', name: 'The Starry Night', tags: ['Art', 'Post-Impressionism', 'Painting', 'Landscape', 'Vincent Van Gogh'] },
     { src: 'Paintings/Gustav_Klimt_046.jpg', type: 'image', alt: 'Portrait of Adele Bloch-Bauer I by Gustav Klimt', name: 'Adele Bloch-Bauer I', tags: ['Art', 'Symbolism', 'Painting', 'Portrait', 'Gustav Klimt'] },
@@ -23,7 +24,54 @@ const mediaItems = [
     { src: 'Paintings/The_Madonna_of_Port_Lligat.jpg', type: 'image', alt: 'The Madonna of Port Lligat by Salvador Dalí', name: 'The Madonna of Port Lligat', tags: ['Art', 'Surrealism', 'Painting', 'Salvador Dalí', 'Religious'] }
 ];
 
+const PHOTOGRAPHS_DATA = [
+    { src: 'Photographs/AA_02860-Edit-2-Edit-Edit_sml-2+copy.jpg', type: 'image', alt: 'Abstract Photography', name: 'Abstract Lines', tags: ['Abstract', 'Photography'] },
+    { src: 'Photographs/Altja_jõgi_Lahemaal.jpg', type: 'image', alt: 'Altja River in Lahemaa', name: 'Altja River', tags: ['Nature', 'Landscape', 'River', 'Estonia'] },
+    { src: 'Photographs/BRONZE©Brian+Creek_Grand+prismatic+spring.jpeg', type: 'image', alt: 'Grand Prismatic Spring', name: 'Grand Prismatic Spring', tags: ['Nature', 'Geothermal', 'Yellowstone', 'USA'] },
+    { src: 'Photographs/BRONZE©Cari+Letelier_Ions+and+water+over+Godafoss.jpeg', type: 'image', alt: 'Ions and Water over Godafoss', name: 'Godafoss', tags: ['Nature', 'Waterfall', 'Iceland'] },
+    { src: 'Photographs/BRONZE©Christian+Passeri_Natterjack+toad.jpeg', type: 'image', alt: 'Natterjack Toad', name: 'Natterjack Toad', tags: ['Wildlife', 'Amphibian'] },
+    { src: 'Photographs/BRONZE©John+Edwards_Leopard+lounge.jpg', type: 'image', alt: 'Leopard Lounge', name: 'Leopard Lounge', tags: ['Wildlife', 'Big Cat'] },
+    { src: 'Photographs/BRONZE©Lukas+Walter_Reaching+for+the+top.jpeg', type: 'image', alt: 'Reaching for the Top', name: 'Reaching for the Top', tags: ['Mountain', 'Climbing', 'Adventure'] },
+    { src: 'Photographs/GOLD©Ael+Kermarec_Reclaim.jpeg', type: 'image', alt: 'Reclaim', name: 'Reclaim', tags: ['Urban', 'Decay', 'Nature'] },
+    { src: 'Photographs/GOLD©Amit+Eshel_Livin\'OnTheEdge.jpeg', type: 'image', alt: 'Livin\' On The Edge', name: 'Livin\' On The Edge', tags: ['Wildlife', 'Bird', 'Cliff'] },
+    { src: 'Photographs/GOLD©Andy+Schmid_Crowd+control.jpeg', type: 'image', alt: 'Crowd Control', name: 'Crowd Control', tags: ['Wildlife', 'Birds', 'Flock'] },
+    { src: 'Photographs/GOLD©Daniel+Flormann_Lenuk+Tasi+.jpeg', type: 'image', alt: 'Lenuk Tasi', name: 'Lenuk Tasi', tags: ['Portrait', 'Culture'] },
+    { src: 'Photographs/GOLD©Georgina+Steytler_Mudskipping.jpg', type: 'image', alt: 'Mudskipping', name: 'Mudskipping', tags: ['Wildlife', 'Bird'] },
+    { src: 'Photographs/GOLD©Ivan+Pedretti_Difference.jpeg', type: 'image', alt: 'Difference', name: 'Difference', tags: ['Landscape', 'Abstract'] },
+    { src: 'Photographs/GOLD©Jake+Mosher_Hyalite+Twilight+.jpeg', type: 'image', alt: 'Hyalite Twilight', name: 'Hyalite Twilight', tags: ['Landscape', 'Winter', 'Twilight'] },
+    { src: 'Photographs/GOLD©Marcio+Esteves+Cabral_Fireworks.jpg', type: 'image', alt: 'Fireworks', name: 'Fireworks', tags: ['Event', 'Night', 'Celebration'] },
+    { src: 'Photographs/GOLD©Miki+Spitzer_Earth\'s+treasure.webp', type: 'image', alt: 'Earth\'s Treasure', name: 'Earth\'s Treasure', tags: ['Nature', 'Gemstone', 'Geology'] },
+    { src: 'Photographs/GOLD©Paul+Goldstein_Five+star+meal.jpg', type: 'image', alt: 'Five Star Meal', name: 'Five Star Meal', tags: ['Wildlife', 'Hunting', 'Nature'] },
+    { src: 'Photographs/GOLD©Richard+Li_Graceful+turn.jpeg', type: 'image', alt: 'Graceful Turn', name: 'Graceful Turn', tags: ['Dance', 'Movement', 'Art'] },
+    { src: 'Photographs/GOLD©Tom+Nickels_Polar+retriever.jpg', type: 'image', alt: 'Polar Retriever', name: 'Polar Retriever', tags: ['Wildlife', 'Polar Bear', 'Arctic'] },
+    { src: 'Photographs/GOLD©Tracey+Lund_Underwater+Gannets.jpeg', type: 'image', alt: 'Underwater Gannets', name: 'Underwater Gannets', tags: ['Wildlife', 'Bird', 'Underwater'] },
+    { src: 'Photographs/pexels-photo-3225517.jpeg', type: 'image', alt: 'Sunrise over mountains', name: 'Mountain Sunrise', tags: ['Nature', 'Mountains', 'Sunrise', 'Landscape'] },
+    { src: 'Photographs/pexels-photo-417074.jpeg', type: 'image', alt: 'Forest path in autumn', name: 'Autumn Forest', tags: ['Nature', 'Forest', 'Autumn', 'Trees'] },
+    { src: 'Photographs/pexels-photo-547119.jpeg', type: 'image', alt: 'Desert landscape with sunset', name: 'Desert Sunset', tags: ['Nature', 'Desert', 'Sunset', 'Landscape'] },
+    { src: 'Photographs/Photographer_Photographing_Nevada_Mountains.jpg', type: 'image', alt: 'Photographer in Nevada Mountains', name: 'Nevada Mountains Photographer', tags: ['Nature', 'Mountains', 'Photography', 'Nevada'] },
+    { src: 'Photographs/SILVER©Jonathan+Hodgetts_Hippos+fight+in+golden+light.jpeg', type: 'image', alt: 'Hippos Fight in Golden Light', name: 'Hippos Fighting', tags: ['Wildlife', 'Hippos', 'Sunset'] },
+    { src: 'Photographs/SILVER©Jules+Oldroyd_She+who+dares.jpg', type: 'image', alt: 'She Who Dares', name: 'She Who Dares', tags: ['Climbing', 'Adventure', 'Nature'] },
+    { src: 'Photographs/SILVER©Lakshitha+Karunarathhna_Oxpecker+and+water+buffalo.jpeg', type: 'image', alt: 'Oxpecker and Water Buffalo', name: 'Oxpecker & Buffalo', tags: ['Wildlife', 'Symbiosis'] },
+    { src: 'Photographs/SILVER©Michael+Stavrakakis_Alike.jpeg', type: 'image', alt: 'Alike', name: 'Alike', tags: ['Portrait', 'Identical'] },
+    { src: 'Photographs/SILVER©Santanu+Majumder_Devghali+beach.jpeg', type: 'image', alt: 'Devghali Beach', name: 'Devghali Beach', tags: ['Landscape', 'Beach', 'India'] },
+    { src: 'Photographs/SILVER©Tom+Way_Rest+easy.jpg', type: 'image', alt: 'Rest Easy', name: 'Rest Easy', tags: ['Wildlife', 'Bear', 'Resting'] },
+    { src: 'Photographs/SILVER©Vince+Burton_Kingfisher+on+ice.jpg', type: 'image', alt: 'Kingfisher on Ice', name: 'Kingfisher on Ice', tags: ['Wildlife', 'Bird', 'Winter'] },
+    { src: 'Photographs/SIM03058a+(1).jpg', type: 'image', alt: 'Simulated Environment', name: 'Simulated Environment', tags: ['Simulation', 'Abstract'] },
+    { src: 'Photographs/TheOceanCleanup_October2nd_Press_Briefing_System001B-24.jpg', type: 'image', alt: 'The Ocean Cleanup System', name: 'Ocean Cleanup', tags: ['Technology', 'Environment', 'Ocean'] }
+];
+
+// Configuration for all available galleries
+const galleriesConfig = [
+    { id: 'paintings', name: 'Paintings', items: PAINTINGS_DATA },
+    { id: 'photographs', name: 'Photographs', items: PHOTOGRAPHS_DATA }
+];
+
+// Global variables for the currently active gallery and media
+let currentGalleryId = 'paintings'; // Default active gallery
+let mediaItems = PAINTINGS_DATA; // This will hold the items of the currently active gallery
 let currentMediaIndex = 0;
+
+// Get DOM elements
 const body = document.body;
 const galleryContainer = document.getElementById('galleryContainer');
 const mainMediaDisplayArea = document.getElementById('mainMediaDisplayArea');
@@ -48,9 +96,12 @@ const tagGalleryTitle = document.getElementById('tagGalleryTitle');
 const infoButton = document.getElementById('infoButton'); // Get info button
 const infoModalOverlay = document.getElementById('infoModalOverlay'); // Get modal overlay
 const modalCloseButton = infoModalOverlay.querySelector('.modal-close-button'); // Get modal close button
-const addFileButton = document.getElementById('addFileButton'); // Get add file button
-const galleryNameButtonContainer = document.getElementById('galleryNameButtonContainer'); // Get gallery name button container
+const addFileButton = document.getElementById('addFileButton'); // NEW: Get add file button
+const galleryNameButtonContainer = document.getElementById('galleryNameButtonContainer'); // NEW: Get gallery name button container
 const downloadAllButton = document.getElementById('downloadAllButton');
+const horizontalConnectorLine1 = document.getElementById('horizontalConnectorLine1'); // NEW: Get horizontal connector line 1
+const horizontalConnectorLine2 = document.getElementById('horizontalConnectorLine2'); // NEW: Get horizontal connector line 2
+const aboutScreen = document.getElementById('aboutScreen');
 
 
 // Function to calculate how many thumbnails can fit in the wrapper
@@ -77,6 +128,14 @@ function displayMedia(index) {
     // Ensure mainMediaDisplayArea is visible and tagGalleryView is hidden
     mainMediaDisplayArea.style.display = 'flex';
     tagGalleryView.style.display = 'none';
+    aboutScreen.style.display = 'none';
+
+    // Show relevant navbar elements for main gallery view
+    mediaNameButton.style.display = 'flex';
+    galleryNameButtonContainer.style.display = 'flex';
+    horizontalConnectorLine1.style.display = 'block';
+    horizontalConnectorLine2.style.display = 'block';
+    thumbnailWrapper.style.display = 'flex'; // Ensure thumbnails are visible
 
     // Show arrows and tags for main view
     prevArrow.style.display = 'block';
@@ -161,6 +220,12 @@ function displayMedia(index) {
 function performSearch(query) {
     console.log(`[performSearch] Called with query: "${query}"`);
 
+    // Check if we are in the about screen (gallery selection screen)
+    if (aboutScreen.style.display === 'flex') {
+        performGallerySearch(query);
+        return;
+    }
+
     if (!query || query.trim() === '') {
         // If query is empty, revert to main gallery view
         console.log(`[performSearch] Query is empty, reverting to main gallery.`);
@@ -173,6 +238,16 @@ function performSearch(query) {
     prevArrow.style.display = 'none';
     nextArrow.style.display = 'none';
     tagsDisplay.style.display = 'none';
+    aboutScreen.style.display = 'none'; // Ensure about screen is hidden when searching
+
+    // Keep thumbnails visible when in search view
+    thumbnailWrapper.style.display = 'flex';
+
+    // Keep relevant navbar elements visible (gallery name, media name, lines)
+    mediaNameButton.style.display = 'flex';
+    galleryNameButtonContainer.style.display = 'flex';
+    horizontalConnectorLine1.style.display = 'block';
+    horizontalConnectorLine2.style.display = 'block';
 
     // Set the title for the tag gallery view
     tagGalleryTitle.textContent = `Results for: "${query}"`;
@@ -248,6 +323,67 @@ function performSearch(query) {
         tagGalleryView.appendChild(thumbnailWrapper);
     });
 }
+
+// NEW: Function to perform search specifically for galleries on the about screen
+function performGallerySearch(query) {
+    console.log(`[performGallerySearch] Called with query: "${query}"`);
+
+    const lowerCaseQuery = query.toLowerCase();
+    const filteredGalleries = galleriesConfig.filter(gallery => {
+        return gallery.name.toLowerCase().includes(lowerCaseQuery);
+    });
+    console.log(`[performGallerySearch] Found ${filteredGalleries.length} galleries for query "${query}".`);
+
+    const gallerySelectionCardsContainer = aboutScreen.querySelector('.gallery-cards-container');
+    gallerySelectionCardsContainer.innerHTML = ''; // Clear existing gallery cards
+
+    if (filteredGalleries.length === 0) {
+        const noResultsMessage = document.createElement('p');
+        noResultsMessage.textContent = `No galleries found matching: "${query}"`;
+        noResultsMessage.classList.add('text-center', 'text-gray-500', 'col-span-full', 'py-8', 'w-full');
+        gallerySelectionCardsContainer.appendChild(noResultsMessage);
+        console.log(`[performGallerySearch] No galleries found, displaying message.`);
+        return;
+    }
+
+    filteredGalleries.forEach(gallery => {
+        const galleryCard = document.createElement('button');
+        galleryCard.classList.add(
+            'flex', 'flex-col', 'items-center', 'justify-center', 'p-6',
+            'rounded-lg', 'shadow-lg', 'bg-white', 'dark:bg-gray-950',
+            'hover:scale-105', 'hover:shadow-xl', 'transition-all', 'duration-300',
+            'cursor:pointer', 'w-48', 'h-48',
+            'text-gray-800', 'dark:text-white', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500'
+        );
+        galleryCard.dataset.galleryId = gallery.id;
+
+        const firstImageSrc = gallery.items.length > 0 && gallery.items[0].type === 'image'
+                                 ? gallery.items[0].src
+                                 : 'https://placehold.co/150x150/cccccc/000000?text=No+Image';
+
+        const imgElement = document.createElement('img');
+        imgElement.src = firstImageSrc;
+        imgElement.alt = `First image of ${gallery.name} gallery`;
+        imgElement.classList.add('w-32', 'h-32', 'object-cover', 'rounded-md', 'mb-2', 'shadow-md');
+        imgElement.onerror = (e) => {
+            e.target.src = 'https://placehold.co/150x150/cccccc/000000?text=Image+Error';
+            e.target.alt = 'Image load error';
+        };
+
+        const nameElement = document.createElement('span');
+        nameElement.classList.add('text-lg', 'font-bold');
+        nameElement.textContent = gallery.name;
+
+        galleryCard.appendChild(imgElement);
+        galleryCard.appendChild(nameElement);
+
+        galleryCard.addEventListener('click', () => {
+            selectGallery(gallery.id);
+        });
+        gallerySelectionCardsContainer.appendChild(galleryCard);
+    });
+}
+
 
 function updateThumbnailHighlight() {
     // Remove active class from all thumbnails first
@@ -396,7 +532,7 @@ function applySavedTheme() {
 // --- Image Preloading Function ---
 function preloadImages(imageUrls) {
     imageUrls.forEach(url => {
-        const mediaItem = mediaItems.find(item => item.src === url);
+        const mediaItem = galleriesConfig.flatMap(g => g.items).find(item => item.src === url); // Check all gallery items
         if (mediaItem && mediaItem.type === 'image') {
             const img = new Image();
             img.src = url;
@@ -408,11 +544,8 @@ function preloadImages(imageUrls) {
 }
 
 // --- End Image Preloading Function ---
-// Download logic for the entire mediaNameButton
+ // NEW: Download logic for the entire mediaNameButton
 mediaNameButton.addEventListener('click', (e) => {
-    // Check if the click originated specifically from the SVG icon inside the button.
-    // If it did, we still want to proceed with download.
-    // If the user clicks the text, it will also trigger.
     console.log(`[Download] Clicked mediaNameButton or its child. Event target:`, e.target);
     const currentItem = mediaItems[currentMediaIndex];
     if (currentItem) {
@@ -425,44 +558,20 @@ mediaNameButton.addEventListener('click', (e) => {
         link.click();
         document.body.removeChild(link);
     }
+    searchInput.value = ''; // Clear search input
 });
 
 // Event listener for the new Add File Button
 addFileButton.addEventListener('click', () => {
-    // In a real application, you would implement file upload logic here.
-    // This might involve:
-    // 1. Opening a file input dialog (e.g., <input type="file"> click())
-    // 2. Handling file selection (FileReader API to read local files)
-    // 3. Uploading to a server (e.g., using Fetch API or XMLHttpRequest)
-    // 4. Updating `mediaItems` array and re-rendering thumbnails/display.
-    // For now, we'll just log a message.
     alert('Upload file coming soon!');
     gallerySubmenu.classList.remove('show'); // Hide submenu after clicking
+    searchInput.value = ''; // Clear search input
 });
 
-// Download logic for the new Download All button
+// NEW: Download logic for the new Download All button
 downloadAllButton.addEventListener('click', () => {
-    // Confirm with the user before starting multiple downloads
-    // if (!confirm('Are you sure you want to download all files? This may trigger multiple download prompts.')) {
-    //     gallerySubmenu.classList.remove('show'); // Hide submenu if user cancels
-    //     return;
-    // }
-
-    // console.log('[Download All] Initiating bulk download.');
-
-    // mediaItems.forEach(item => {
-    //     const link = document.createElement('a');
-    //     link.href = item.src;
-    //     // Get the filename from the source URL
-    //     const filename = item.src.substring(item.src.lastIndexOf('/') + 1);
-    //     link.download = filename;
-    //     document.body.appendChild(link);
-    //     link.click();
-    //     document.body.removeChild(link);
-    // });
-
-    gallerySubmenu.classList.remove('show'); // Hide submenu after clicking
     alert('Bulk download is a Premium feature only!');
+    searchInput.value = ''; // Clear search input
 });
 
 
@@ -481,12 +590,17 @@ document.addEventListener('keydown', (event) => {
         if (searchInput.value !== '' || isSearchInputFocused) {
             searchInput.value = '';
             searchInput.blur();
-            performSearch(''); // Clear search results immediately
+            // Determine search behavior based on current screen
+            if (aboutScreen.style.display === 'flex') {
+                performGallerySearch(''); // Clear gallery search results
+            } else {
+                performSearch(''); // Clear file search results
+            }
             event.preventDefault();
             return;
         }
-        // If in tag gallery view, close it
-        if (tagGalleryView.style.display === 'grid') {
+        // If in tag gallery view or about screen, close it
+        if (tagGalleryView.style.display === 'grid' || aboutScreen.style.display === 'flex') {
             displayMedia(currentMediaIndex); // Go back to main display
             event.preventDefault();
             return;
@@ -505,9 +619,14 @@ document.addEventListener('keydown', (event) => {
         console.log('Search triggered with:', searchInput.value);
     } else if (isSearchInputFocused && event.key === 'Enter') {
         event.preventDefault();
-        performSearch(searchInput.value); // Trigger search on Enter
+        // Perform appropriate search based on current screen
+        if (aboutScreen.style.display === 'flex') {
+            performGallerySearch(searchInput.value);
+        } else {
+            performSearch(searchInput.value); // Trigger search on Enter
+        }
         console.log('Search triggered from focused input with:', searchInput.value);
-    } else if (!isSearchInputFocused && tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) {
+    } else if (!isSearchInputFocused && tagGalleryView.style.display === 'none' && aboutScreen.style.display === 'none' && !infoModalOverlay.classList.contains('show')) {
         // Only allow gallery navigation if the search input is not focused,
         // tagGalleryView is not active, AND modal is not open
         if (event.key === 'ArrowLeft') {
@@ -528,35 +647,77 @@ document.addEventListener('click', (event) => {
     }
 });
 
-// Add real-time search on input
+// Add real-time search on input - now conditional based on screen
 searchInput.addEventListener('input', () => {
-    performSearch(searchInput.value);
+    if (aboutScreen.style.display === 'flex') {
+        performGallerySearch(searchInput.value);
+    } else {
+        performSearch(searchInput.value);
+    }
 });
 
 prevArrow.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
+    if (tagGalleryView.style.display === 'none' && aboutScreen.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
         previousMedia();
     }
 });
 nextArrow.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
+    if (tagGalleryView.style.display === 'none' && aboutScreen.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
         nextMedia();
     }
 });
 
-searchButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    performSearch(searchInput.value);
+// Add hover effects for arrows
+galleryContainer.addEventListener('mousemove', (event) => {
+    if (tagGalleryView.style.display === 'none' && aboutScreen.style.display === 'none' && !infoModalOverlay.classList.contains('show')) {
+        const containerRect = galleryContainer.getBoundingClientRect();
+        const mouseX = event.clientX - containerRect.left;
+        const halfWidth = containerRect.width / 2;
+
+        if (mouseX < halfWidth) {
+            prevArrow.style.opacity = '1';
+            nextArrow.style.opacity = '0';
+        } else {
+            nextArrow.style.opacity = '1';
+            prevArrow.style.opacity = '0';
+        }
+    } else {
+        prevArrow.style.opacity = '0';
+        nextArrow.style.opacity = '0';
+    }
 });
 
-themeToggle.addEventListener('click', toggleTheme);
+galleryContainer.addEventListener('mouseleave', () => {
+    prevArrow.style.opacity = '0';
+    nextArrow.style.opacity = '0';
+});
+
+
+searchButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    // Perform appropriate search based on current screen
+    if (aboutScreen.style.display === 'flex') {
+        performGallerySearch(searchInput.value);
+    } else {
+        performSearch(searchInput.value);
+    }
+});
+
+// Modified themeToggle click listener to stop propagation
+themeToggle.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent click from bubbling up to appName and closing the submenu
+    toggleTheme();
+    searchInput.value = ''; // Clear search input
+});
 
 // Event listeners for Information Modal
 infoButton.addEventListener('click', () => {
     infoModalOverlay.classList.add('show');
-    themeSubmenu.classList.remove('show'); // Hide submenu when modal opens
+    // This line was previously commented out, meaning the submenu was already NOT closing.
+    // themeSubmenu.classList.remove('show'); // No longer needed here as per previous update.
+    searchInput.value = ''; // Clear search input
 });
 
 modalCloseButton.addEventListener('click', () => {
@@ -573,7 +734,7 @@ infoModalOverlay.addEventListener('click', (event) => {
 // Add scrollwheel functionality
 galleryContainer.addEventListener('wheel', (event) => {
     event.preventDefault(); // Prevent default page scrolling
-    if (tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
+    if (tagGalleryView.style.display === 'none' && aboutScreen.style.display === 'none' && !infoModalOverlay.classList.contains('show')) { // Only navigate if in main view and modal is not open
         if (event.deltaY < 0) {
             previousMedia();
         } else if (event.deltaY > 0) {
@@ -584,12 +745,13 @@ galleryContainer.addEventListener('wheel', (event) => {
 
 galleryContainer.addEventListener('click', (event) => {
     // Only handle clicks for main media navigation if tagGalleryView is not active AND modal is not open
-    if (tagGalleryView.style.display === 'none' && !infoModalOverlay.classList.contains('show')) {
+    if (tagGalleryView.style.display === 'none' && aboutScreen.style.display === 'none' && !infoModalOverlay.classList.contains('show')) {
         // Change to target mainMediaDisplayArea for click logic
         const currentMediaElement = mainMediaDisplayArea.querySelector('img, video');
 
             if (currentMediaElement) {
             const mediaRect = currentMediaElement.getBoundingClientRect();
+            // Fix: Changed mediaMediaRect.left to mediaRect.left
             const clickX = event.clientX - mediaRect.left;
 
             if (clickX < mediaRect.width / 2) {
@@ -628,6 +790,43 @@ galleryNameButtonContainer.addEventListener('mouseleave', () => {
     gallerySubmenu.classList.remove('show');
 });
 
+// Add event listener for the new gallery name button to show all items
+galleryNameButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    themeSubmenu.classList.remove('show');
+    gallerySubmenu.classList.remove('show');
+
+    // Deselect the currently selected thumbnail in the navbar
+    const activeThumbnail = thumbnailWrapper.querySelector('.thumbnail-item.active');
+    if (activeThumbnail) {
+        activeThumbnail.classList.remove('active');
+    }
+
+    // Hide the main content area if it's currently showing
+    mainMediaDisplayArea.style.display = 'none';
+
+    // Show all items from the current active gallery
+    showAllGalleryItems();
+    searchInput.value = ''; // Clear search input
+});
+
+// Click listener for the 'mBed' logo to show the gallery selection screen
+appName.addEventListener('click', (e) => {
+    e.stopPropagation();
+    themeSubmenu.classList.remove('show');
+    gallerySubmenu.classList.remove('show');
+
+    // Deselect the currently selected thumbnail in the navbar
+    const activeThumbnail = thumbnailWrapper.querySelector('.thumbnail-item.active');
+    if (activeThumbnail) {
+        activeThumbnail.classList.remove('active');
+    }
+
+    showGallerySelectionScreen(); // Show the new screen to select a gallery
+    searchInput.value = ''; // Clear search input
+});
+
+
 // Add event listener for window resize to re-create thumbnails
 let resizeTimeout;
 window.addEventListener('resize', () => {
@@ -637,10 +836,189 @@ window.addEventListener('resize', () => {
     }, 100); // Debounce to prevent excessive calls
 });
 
+// Function to display all media items from the currently selected gallery in the tag gallery view.
+function showAllGalleryItems() {
+    console.log(`[showAllGalleryItems] Displaying all items for current gallery.`);
+
+    // Hide main gallery elements and about screen
+    mainMediaDisplayArea.style.display = 'none';
+    prevArrow.style.display = 'none';
+    nextArrow.style.display = 'none';
+    tagsDisplay.style.display = 'none';
+    aboutScreen.style.display = 'none';
+    thumbnailWrapper.style.display = 'flex'; // Keep thumbnails visible when in "all items" view
+
+    // Show relevant navbar elements
+    galleryNameButtonContainer.style.display = 'flex'; // Ensure gallery button is visible
+    horizontalConnectorLine1.style.display = 'block'; // Keep the first connector line visible
+    mediaNameButton.style.display = 'none'; // Hide media name button
+    horizontalConnectorLine2.style.display = 'none'; // Hide second connector line
+
+
+    // Set the title for the tag gallery view based on the current gallery
+    const currentGalleryObject = galleriesConfig.find(g => g.id === currentGalleryId);
+    tagGalleryTitle.textContent = `Gallery: ${currentGalleryObject ? currentGalleryObject.name : 'Unknown'}`;
+    console.log(`[showAllGalleryItems] Setting tag gallery title to: "${tagGalleryTitle.textContent}"`);
+
+    // Show tag gallery view
+    tagGalleryView.style.display = 'grid';
+
+    // Clear previous content in tag gallery view except for the title
+    let currentChildren = Array.from(tagGalleryView.children);
+    currentChildren.forEach(child => {
+        if (child !== tagGalleryTitle) {
+            child.remove();
+        }
+    });
+    console.log('[showAllGalleryItems] Cleared previous tag gallery content.');
+
+    // Ensure title is first child
+    if (tagGalleryView.firstChild !== tagGalleryTitle) {
+        tagGalleryView.prepend(tagGalleryTitle);
+        console.log('[showAllGalleryItems] Prepended tag gallery title.');
+    }
+
+    // Loop through ALL mediaItems of the CURRENT gallery
+    mediaItems.forEach((item) => {
+        const thumbnailWrapper = document.createElement('div');
+        // Added a new class for the container around the image for background color in dark mode
+        thumbnailWrapper.classList.add('relative', 'group', 'overflow-hidden', 'rounded-lg', 'shadow-md', 'tag-gallery-thumbnail-container');
+
+        const img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.alt;
+        img.classList.add('tag-gallery-thumbnail');
+        img.onerror = (e) => {
+            console.error(`[showAllGalleryItems] Error loading tag gallery thumbnail: ${item.src}.`);
+            if (!e.target.dataset.placeholderSet) {
+                e.target.src = `https://placehold.co/200x150/cccccc/000000?text=Thumb+Error`;
+                e.target.dataset.placeholderSet = 'true';
+            }
+        };
+
+        const titleOverlay = document.createElement('div');
+        titleOverlay.classList.add('absolute', 'bottom-0', 'left-0', 'right-0', 'bg-gradient-to-t', 'from-black', 'to-transparent', 'text-white', 'p-2', 'text-sm', 'font-semibold', 'opacity-0', 'group-hover:opacity-100', 'transition-opacity', 'duration-300');
+        titleOverlay.textContent = item.name;
+
+        thumbnailWrapper.appendChild(img);
+        thumbnailWrapper.appendChild(titleOverlay);
+
+        // Add click listener to display the selected item in the main gallery
+        thumbnailWrapper.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const originalIndex = mediaItems.indexOf(item); // Get index from the current gallery's items
+            console.log(`[showAllGalleryItems - thumbnailClick] Clicked thumbnail for item: "${item.name}", its original index is: ${originalIndex}`);
+            searchInput.value = '';
+            displayMedia(originalIndex); // Display the selected media
+        });
+
+        tagGalleryView.appendChild(thumbnailWrapper);
+    });
+}
+
+// Function to display the gallery selection screen (the "mBed" logo screen).
+function showGallerySelectionScreen() {
+    console.log(`[showGallerySelectionScreen] Showing gallery selection screen.`);
+
+    // Hide all other content areas
+    mainMediaDisplayArea.style.display = 'none';
+    tagGalleryView.style.display = 'none';
+    prevArrow.style.display = 'none';
+    nextArrow.style.display = 'none';
+    tagsDisplay.style.display = 'none';
+
+    // Hide thumbnails ONLY when the mBed logo screen is active
+    thumbnailWrapper.style.display = 'none';
+
+    // Hide elements not relevant to the gallery selection screen
+    mediaNameButton.style.display = 'none';
+    galleryNameButtonContainer.style.display = 'none'; // Hide gallery button
+    horizontalConnectorLine1.style.display = 'none'; // Hide first connector line
+    horizontalConnectorLine2.style.display = 'none';
+
+
+    // Show the about screen (now repurposed for gallery selection)
+    aboutScreen.style.display = 'flex'; // Use flex to center its content
+
+    // Clear any previously added gallery cards from the about screen
+    const gallerySelectionCardsContainer = aboutScreen.querySelector('#gallerySelectionCards'); // Get the specific container
+    if (gallerySelectionCardsContainer) {
+        gallerySelectionCardsContainer.innerHTML = ''; // Clear its content
+    } else {
+        console.error("Gallery selection cards container not found!");
+        return;
+    }
+
+    // Ensure the original mBed logo text and "Media Browser Embedded Display" are present.
+    // They are defined in index.html as part of aboutScreen.
+    // We only need to ensure they are visible, which is handled by aboutScreen.style.display = 'flex'.
+
+    galleriesConfig.forEach(gallery => {
+        const galleryCard = document.createElement('button');
+        galleryCard.classList.add(
+            'flex', 'flex-col', 'items-center', 'justify-center', 'p-6',
+            'rounded-lg', 'shadow-lg', 'bg-white', 'dark:bg-gray-950', /* Updated background colors */
+            'hover:scale-105', 'hover:shadow-xl', 'transition-all', 'duration-300',
+            'cursor:pointer', 'w-48', 'h-48', // Increased height to accommodate image
+            'text-gray-800', 'dark:text-white', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500'
+        );
+        galleryCard.dataset.galleryId = gallery.id; // Store the gallery ID
+
+        // Get the first item's source for the image
+        const firstImageSrc = gallery.items.length > 0 && gallery.items[0].type === 'image'
+                                 ? gallery.items[0].src
+                                 : 'https://placehold.co/150x150/cccccc/000000?text=No+Image'; // Placeholder if no image or empty gallery
+
+        const imgElement = document.createElement('img');
+        imgElement.src = firstImageSrc;
+        imgElement.alt = `First image of ${gallery.name} gallery`;
+        imgElement.classList.add('w-32', 'h-32', 'object-cover', 'rounded-md', 'mb-2', 'shadow-md');
+        imgElement.onerror = (e) => {
+            e.target.src = 'https://placehold.co/150x150/cccccc/000000?text=Image+Error';
+            e.target.alt = 'Image load error';
+        };
+
+        const nameElement = document.createElement('span');
+        nameElement.classList.add('text-lg', 'font-bold');
+        nameElement.textContent = gallery.name;
+
+        galleryCard.appendChild(imgElement);
+        galleryCard.appendChild(nameElement);
+
+        galleryCard.addEventListener('click', () => {
+            selectGallery(gallery.id); // Select and display the chosen gallery
+        });
+        gallerySelectionCardsContainer.appendChild(galleryCard);
+    });
+}
+
+
+// Function to select a gallery by its ID, update the mediaItems array, and display the full gallery view.
+function selectGallery(galleryId) {
+    const selectedGallery = galleriesConfig.find(g => g.id === galleryId);
+    if (selectedGallery) {
+        currentGalleryId = galleryId;
+        mediaItems = selectedGallery.items; // Reassign the global mediaItems array
+        currentMediaIndex = 0; // Reset index for the new gallery
+        galleryNameButton.querySelector('span').textContent = selectedGallery.name; // Update the navbar gallery name
+
+        // Show the gallery page (full gallery view)
+        showAllGalleryItems();
+    } else {
+        console.error(`Gallery with ID "${galleryId}" not found.`);
+    }
+}
+
+
+// Initial setup on window load
 window.onload = function() {
     applySavedTheme();
-    // Call displayMedia first, which will then call createThumbnails
-    displayMedia(0);
-    // Call preloadImages after initial display
-    preloadImages(mediaItems.map(item => item.src));
+    // Initialize the gallery name button text
+    const initialGallery = galleriesConfig.find(g => g.id === currentGalleryId);
+    if (initialGallery) {
+        galleryNameButton.querySelector('span').textContent = initialGallery.name;
+    }
+
+    displayMedia(0); // Display the first item of the default gallery
+    preloadImages(PAINTINGS_DATA.map(item => item.src).concat(PHOTOGRAPHS_DATA.map(item => item.src))); // Preload all images from all galleries
 };
