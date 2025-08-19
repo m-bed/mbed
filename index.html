@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>mBed</title>
-    <!-- Link to external Tailwind CSS (CDN) -->
+    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Link to external Inter font (CDN) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Link to your custom external CSS file -->
     <link rel="stylesheet" href="style.css">
@@ -20,8 +19,7 @@
 
         <!-- Container for tags, absolutely positioned on the left -->
         <div id="tagsDisplay">
-            <!-- 'Tags' label and tags will be inserted here by JavaScript -->
-        </div>
+            </div>
 
         <!-- Navigation Arrows (for visual click, primarily for keyboard) -->
         <div id="prevArrow" class="arrow-button arrow-left">‹</div>
@@ -30,7 +28,19 @@
         <!-- New Tag Gallery View (Hidden by default) -->
         <div id="tagGalleryView">
             <h2 id="tagGalleryTitle" class="text-lg font-semibold mb-4 text-white col-span-full"></h2>
-            <!-- Filtered thumbnails will be loaded here by JavaScript -->
+            </div>
+
+        <!-- NEW: About Screen (Hidden by default) -->
+        <div id="aboutScreen" class="absolute inset-0 flex flex-col items-center justify-center transition-colors duration-300 z-40" style="display: none;">
+            <span class="app-name-large text-7xl font-extrabold text-gray-800 dark:text-white mb-4">mBed</span>
+            <p class="text-lg text-gray-600 dark:text-gray-300">Media Browser Embedded Display</p>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">
+                Source: <a href="https://github.com/3Daim/mbed/" target="_blank" class="text-blue-500 hover:underline dark:text-blue-300">https://github.com/3Daim/mbed/</a>
+            </p>
+            <!-- Gallery cards will be dynamically added here by script.js -->
+            <div id="gallerySelectionCards" class="gallery-cards-container flex flex-col md:flex-row gap-6 mt-12 w-full justify-center items-center">
+                <!-- Gallery cards will be dynamically added here -->
+            </div>
         </div>
     </div>
 
@@ -69,10 +79,10 @@
                 </div>
             </div>
             <!-- First horizontal line connecting "mBed" to "Art" -->
-            <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
+            <div id="horizontalConnectorLine1" class="horizontal-connector-line"></div>
             <!-- Gallery Name button - now includes its own submenu -->
             <div id="galleryNameButtonContainer" class="relative">
-                <button id="galleryNameButton" class="h-[46px] px-3 py-2 rounded-md transition-colors duration-200 text-sm font-semibold">
+                <button id="galleryNameButton" class="h-[46px] px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200 text-sm font-semibold">
                     <span>Paintings</span>
                 </button>
                 <div id="gallerySubmenu" class="submenu-container">
@@ -89,7 +99,7 @@
                 </div>
             </div>
             <!-- Second horizontal line connecting "Art" to media name -->
-            <div class="horizontal-connector-line bg-gray-400 dark:bg-gray-600"></div>
+            <div id="horizontalConnectorLine2" class="horizontal-connector-line"></div>
             <!-- Media name button - now includes the download icon -->
             <button id="mediaNameButton" class="h-[46px] px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200 text-sm font-semibold">
                 <span>No Media Selected</span>
@@ -100,12 +110,12 @@
             </button>
         </div>
 
-        <div id="thumbnailWrapper" class="thumbnail-wrapper">
-            <!-- Thumbnails will be dynamically loaded here by JavaScript -->
-        </div>
-
-        <!-- Right content group with fixed width -->
-        <div class="navbar-fixed-section flex justify-end items-center">
+        <!-- Right content group: Thumbnails and Search Bar -->
+        <div class="navbar-right-group flex items-center gap-4">
+            <!-- Scrollable Thumbnail Wrapper (middle section) -->
+            <div id="thumbnailWrapper" class="thumbnail-wrapper">
+                </div>
+            <!-- Search bar and button specific styling -->
             <div class="search-container flex items-center gap-2">
                 <input type="text" id="searchInput" placeholder="Type anywhere to search..." class="px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-gray-800">
                 <button id="searchButton" class="px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200">
@@ -117,19 +127,19 @@
         </div>
     </div>
 
-    <!-- The Modal HTML Structure -->
+    <!-- The Modal HTML Structure (for info button) -->
     <div id="infoModalOverlay" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close-button">&times;</button>
             <h3 class="text-xl font-bold mb-4">mbed v1.0</h3>
             <h2 class="text-x1 font-bold mb-4">Media Browser Embedded Display</h2>
-            </p><p class="text-black dark:text-gray-300 mt-2">
+            <p class="text-black dark:text-gray-300 mt-2">
                 Source: <a href="https://github.com/3Daim/mbed/" target="_blank" class="text-blue-500 hover:underline dark:text-blue-300">https://github.com/3Daim/mbed/</a>
             </p>
         </div>
     </div>
 
-    <!-- Link to your external JavaScript file -->
+    <!-- Link to external JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>
